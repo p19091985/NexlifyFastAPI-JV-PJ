@@ -1,0 +1,60 @@
+{# templates/partials/_iris_analise_pca.html (CORRIGIDO) #}
+
+{% if error_message %}
+<div class="alert alert-warning">{{ error_message }}</div>
+{% else %}
+<div class="card shadow-sm" x-data x-init="
+    (async () => {
+        // Espera um pouco mais para garantir que ApexCharts está carregado
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+        const chartDiv = document.querySelector('#chart-pca-1');
+        if (!chartDiv) {
+             console.error('Elemento #chart-pca-1 não encontrado.');
+             return;
+        }
+
+        if (typeof ApexCharts === 'undefined') {
+            console.error('ApexCharts.js não está carregado.');
+            chartDiv.innerHTML = '<div class=\'alert alert-danger small p-2 text-center\'>Erro: ApexCharts.js não carregado.</div>';
+            return;
+        }
+
+        const chartData = {{ chart_pca | tojson | safe }};
+
+        // Log para depuração
+        console.log('Dados recebidos para PCA:', chartData);
+
+        // Verificação mais robusta
+        let isValid = chartData &&
+                      chartData !== 'error' &&
+                      typeof chartData === 'object';
+
+        if (!isValid) {
+            console.warn('Dados inválidos ou erro recebido para PCA:', chartData);
+            chartDiv.innerHTML = '<div class=\'alert alert-warning small p-2 text-center\'>Gráfico indisponível ou erro na geração. Verifique os logs do servidor.</div>';
+            return;
+        }
+
+        try {
+            const chart = new ApexCharts(chartDiv, chartData);
+            chart.render();
+            chartDiv.style.minHeight = 'auto';
+            console.log('Gráfico PCA renderizado com sucesso.');
+        } catch (e) {
+            console.error('Erro ao renderizar ApexChart PCA:', e, chartData);
+            chartDiv.innerHTML = '<div class=\'alert alert-danger small p-2 text-center\'>Erro ao renderizar gráfico PCA. Verifique o console do navegador.</div>';
+        }
+    })();
+">
+    <div class="card-body">
+        <div id="chart-pca-1" style="min-height: 465px;">
+            <div class="text-center p-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Carregando gráfico PCA...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}

@@ -1,0 +1,144 @@
+{# templates/partials/_iris_analise_eda.html (CORRIGIDO) #}
+
+<div x-data
+     x-init="
+        // Aguarda até que todas as bibliotecas estejam carregadas
+        const initCharts = async () => {
+            // Espera um pouco mais para garantir que ApexCharts está carregado
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            if (typeof ApexCharts === 'undefined') {
+                console.error('ApexCharts.js não está carregado.');
+                document.querySelectorAll('[id^=chart-eda-]').forEach(div => {
+                    div.innerHTML = '<div class=\"alert alert-danger small p-2 text-center\">Erro: ApexCharts.js não carregado.</div>';
+                });
+                return;
+            }
+
+            const renderChart = (chartId, chartData) => {
+                const chartDiv = document.querySelector(chartId);
+                if (!chartDiv) {
+                    console.error(`Elemento ${chartId} não encontrado.`);
+                    return;
+                }
+
+                console.log(`Dados recebidos para ${chartId}:`, chartData);
+
+                // Verificação robusta de dados
+                let isValid = chartData &&
+                             typeof chartData === 'object' &&
+                             !chartData.error &&
+                             chartData.series &&
+                             Array.isArray(chartData.series);
+
+                if (!isValid) {
+                    console.warn(`Dados inválidos para ${chartId}:`, chartData);
+                    const errorMsg = chartData?.error || 'Gráfico indisponível';
+                    chartDiv.innerHTML = `<div class='alert alert-warning small p-2 text-center'>${errorMsg}</div>`;
+                    return;
+                }
+
+                try {
+                    const chart = new ApexCharts(chartDiv, chartData);
+                    chart.render();
+                    console.log(`Gráfico ${chartId} renderizado com sucesso.`);
+                } catch (e) {
+                    console.error(`Erro ao renderizar ${chartId}:`, e);
+                    chartDiv.innerHTML = '<div class=\"alert alert-danger small p-2 text-center\">Erro ao renderizar gráfico.</div>';
+                }
+            };
+
+            // Renderiza gráficos com pequenos delays
+            renderChart('#chart-eda-1', {{ charts.chart1 | tojson | safe }});
+            setTimeout(() => renderChart('#chart-eda-2', {{ charts.chart2 | tojson | safe }}), 100);
+            setTimeout(() => renderChart('#chart-eda-3', {{ charts.chart3 | tojson | safe }}), 200);
+            setTimeout(() => renderChart('#chart-eda-4', {{ charts.chart4 | tojson | safe }}), 300);
+            setTimeout(() => renderChart('#chart-eda-5', {{ charts.chart5 | tojson | safe }}), 400);
+            setTimeout(() => renderChart('#chart-eda-6', {{ charts.chart6 | tojson | safe }}), 500);
+        };
+
+        // Inicia o processo
+        initCharts();
+     "
+>
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div id="chart-eda-1" style="min-height: 365px;">
+                        <div class="text-center p-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Carregando gráfico 1...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div id="chart-eda-2" style="min-height: 365px;">
+                        <div class="text-center p-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Carregando gráfico 2...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div id="chart-eda-3" style="min-height: 365px;">
+                        <div class="text-center p-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Carregando gráfico 3...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div id="chart-eda-4" style="min-height: 365px;">
+                        <div class="text-center p-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Carregando gráfico 4...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div id="chart-eda-5" style="min-height: 365px;">
+                        <div class="text-center p-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Carregando gráfico 5...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div id="chart-eda-6" style="min-height: 365px;">
+                        <div class="text-center p-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Carregando gráfico 6...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
