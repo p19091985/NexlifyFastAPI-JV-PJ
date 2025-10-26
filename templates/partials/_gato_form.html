@@ -1,0 +1,46 @@
+{% set is_edit = gato is defined %}
+<div class="card bg-body-secondary mb-4" x-data>
+    <div class="card-body">
+        <h5 class="card-title">
+            {% if is_edit %}✏️ Editando Espécie{% else %}➕ Adicionar Nova Espécie{% endif %}
+        </h5>
+        <form
+            {% if is_edit %}
+                hx-put="/gatos/{{ gato.id }}"
+                hx-target="#gato-row-{{ gato.id }}"
+                hx-swap="outerHTML"
+            {% else %}
+                hx-post="/gatos/"
+                hx-target="#gatos-tabela-corpo"
+                hx-swap="beforeend"
+                hx-on::after-request="this.closest('form').reset(); htmx.find('#gatos-empty-row')?.remove();"
+            {% endif %}
+        >
+            <div id="form-messages"></div> <div class="mb-3">
+                <label for="nome_especie" class="form-label">Nome da Espécie *</label>
+                <input type="text" class="form-control" id="nome_especie" name="nome_especie"
+                       value="{{ gato.nome_especie if is_edit else '' }}" required>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="pais_origem" class="form-label">País de Origem</label>
+                    <input type="text" class="form-control" id="pais_origem" name="pais_origem"
+                           value="{{ gato.pais_origem if is_edit else '' }}">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="temperamento" class="form-label">Temperamento</label>
+                    <textarea class="form-control" id="temperamento" name="temperamento" rows="3">{{ gato.temperamento if is_edit else '' }}</textarea>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-secondary"
+                        hx-get="/gatos/cancelar"
+                        hx-target="#form-container"
+                        hx-swap="innerHTML">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>

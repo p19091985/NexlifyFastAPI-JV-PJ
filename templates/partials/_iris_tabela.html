@@ -1,0 +1,60 @@
+<h3 class="h6 text-muted visually-hidden">Visualização dos Dados</h3> 
+<div class="table-responsive">
+    <table class="table table-sm table-striped table-bordered mb-0"> 
+        <thead class="table-light"> 
+            <tr>
+                {% for header in headers %}
+                <th>{{ header | replace('_', ' ') | title }}</th> 
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+            <tr>
+                {% for header in headers %}
+                 {% if row[header] is number and row[header] is not integer %}
+                     <td>{{ "%.2f"|format(row[header]) }}</td>
+                 {% else %}
+                    <td>{{ row[header] }}</td>
+                 {% endif %}
+                {% endfor %}
+            </tr>
+            {% else %}
+             <tr>
+                 <td colspan="{{ headers|length }}" class="text-center text-muted fst-italic">Nenhum dado para exibir nesta página.</td>
+             </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="d-flex justify-content-between align-items-center mt-3 px-2">
+    <p class="text-muted mb-0 small">
+        Mostrando {{ start_idx }}-{{ end_idx }} de {{ total_rows }} registros | Página {{ page }}/{{ total_pages }}
+    </p>
+    <div class="btn-group btn-group-sm" role="group">
+        <button class="btn btn-outline-secondary"
+                hx-get="/iris/tabela?page={{ page - 1 }}"
+                hx-target="#tabela-container-card-body"
+                hx-indicator="#iris-spinner-global"
+                hx-swap="innerHTML"
+                aria-label="Página Anterior"
+                {% if page <= 1 %}disabled{% endif %}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+            </svg>
+            Anterior
+        </button>
+        <button class="btn btn-outline-secondary"
+                hx-get="/iris/tabela?page={{ page + 1 }}"
+                hx-target="#tabela-container-card-body"
+                hx-indicator="#iris-spinner-global"
+                hx-swap="innerHTML"
+                aria-label="Próxima Página"
+                {% if page >= total_pages %}disabled{% endif %}>
+            Próximo
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+            </svg>
+        </button>
+    </div>
+</div>

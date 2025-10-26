@@ -1,0 +1,83 @@
+{% extends "_base.html" %}
+{% block title %}Sobre o Sistema{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 800px;">
+    <h1 class="display-5">🚀 Sobre Este Sistema</h1>
+    <p class="lead text-muted">Arquitetura, Propósito e Migração.</p>
+    <hr>
+    <div class="alert alert-info">
+        <strong>Sistema de Demonstração - Versão 3.0 (FastAPI + HTMX)</strong>
+        <p class="mb-0">
+            Esta aplicação representa a modernização de um sistema originalmente construído
+            com Tkinter/ttkbootstrap e posteriormente migrado para Streamlit.
+            O objetivo foi migrar para uma interface web interativa usando <strong>FastAPI</strong>,
+            <strong>Jinja2</strong>, e <strong>HTMX</strong>, preservando um back-end de dados robusto.
+        </p>
+    </div>
+    <div class="accordion" id="accordionSobre">
+        <div class="card mb-3" x-data="{ open: true }"> 
+            <div class="card-header bg-light-subtle" @click="open = !open" style="cursor: pointer;">
+                <h4 class="mb-0 d-flex justify-content-between align-items-center">
+                    <span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-layers-half me-2" viewBox="0 0 16 16">
+                          <path d="M8.235 1.559a.5.5 0 0 0-.47 0l-7.5 4a.5.5 0 0 0 0 .882L3 8.4v3.097a.5.5 0 0 0 .287.447l4.5 2.25a.5.5 0 0 0 .426 0l4.5-2.25a.5.5 0 0 0 .287-.447V8.4l2.765-1.479a.5.5 0 0 0 0-.882l-7.5-4zM8 9.433 1.562 6 8 2.567 14.438 6 8 9.433zM7.5 9.9v3.097l-4.5-2.25V8.4l4.5 2.408v-1.116zM8.5 9.9v1.116l4.5-2.408V7.653l-4.5 2.25V9.9z"/>
+                        </svg>
+                        Arquitetura com FastAPI (A Interface)
+                    </span>
+                    <span x-show="!open" class="text-muted small">▸ Expandir</span>
+                    <span x-show="open" class="text-muted small">▾ Recolher</span>
+                </h4>
+            </div>
+            <div x-show="open" x-transition>
+                <div class="card-body">
+                    <p>
+                        A arquitetura foi adaptada para um modelo cliente-servidor moderno,
+                        onde o FastAPI atua como o back-end e o Jinja2/HTMX renderiza a interface.
+                    </p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>FastAPI (Backend):</strong> Gerencia as rotas, a lógica de negócios e a autenticação.</li>
+                        <li class="list-group-item"><strong>Roteadores (`routers/`):</strong> Cada "página" (como Gatos ou Usuários) tem seu próprio arquivo de rotas.</li>
+                        <li class="list-group-item"><strong>Jinja2 (Templates):</strong> Renderiza o HTML inicial da página.</li>
+                        <li class="list-group-item"><strong>HTMX (Interatividade):</strong> Ações como salvar ou excluir disparam requisições que trocam *apenas* fragmentos de HTML (ex: uma linha da tabela), tornando a UI rápida e responsiva.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="card mb-3" x-data="{ open: false }"> 
+            <div class="card-header bg-light-subtle" @click="open = !open" style="cursor: pointer;">
+                <h4 class="mb-0 d-flex justify-content-between align-items-center">
+                    <span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-database-gear me-2" viewBox="0 0 16 16">
+                          <path d="M8 1c-1.573 0-3.022.289-4.096.807C2.875 2.305 1.94 3.03 1.14 4.043C.342 5.057 0 6.22 0 7.5s.342 2.443 1.14 3.457c.797 1.012 1.734 1.737 2.766 2.236C4.978 13.71 6.427 14 8 14c.861 0 1.704-.077 2.508-.231l.006-.004l.01.004c.106.96-.062 1.912-.498 2.652A1.986 1.986 0 0 1 8.57 16l-.01.001l-.006-.002l-.014.004l-.01.004c-.11 0-.218-.008-.325-.024C4.568 15.71 1.83 13.842 1.074 10.71c-.755-3.128.27-6.335 2.148-8.213C4.945.77 7.18 0 9.45 0c1.546 0 2.964.468 4.062 1.309C14.61 2.195 15 3.33 15 4.5c0 .693-.09 1.362-.262 1.995C14.053 5.56 13.1 5 12 5c-1.837 0-3.435.84-4.402 2.122C7.21 7.538 7 8.01 7 8.5c0 .49.21 1.002.598 1.47C8.565 11.16 10.163 12 12 12c.57 0 1.11-.11 1.6-.307c.099.34.18.68.24 1.018C13.598 12.89 12.82 13 12 13c-1.837 0-3.435-.84-4.402-2.122C7.21 10.378 7 9.898 7 9.43v-.001c0-.49.21-.962.598-1.332C8.565 6.84 10.163 6 12 6c.704 0 1.355.162 1.912.44C14.51 5.94 15 5.24 15 4.5c0-.847-.38-1.585-.98-2.118C13.23 1.62 12.01 1.17 10.645 1.03C9.845 1.01 9.04 1 8 1z"/>
+                          <path d="M12.999 11.001a.996.996 0 0 1 .99 1.005v.99a.996.996 0 1 1-1.99 0v-.99a.996.996 0 0 1 .99-.995zM15.22 12.01c-.24-.73-.8-1.306-1.517-1.611l-.22-.099a.834.834 0 0 0-.98.3l-.014.022a.834.834 0 0 0 .3.98l.098.22c.28.62.24 1.32-.12 1.881l-.014.02a.834.834 0 0 0 .98.3l.22-.098c.71-.305 1.27-.88 1.51-1.61l.015-.022a.834.834 0 0 0-.3-.98l-.098-.22zM12.999 7.001a.996.996 0 0 1 .99 1.005v.99a.996.996 0 1 1-1.99 0v-.99a.996.996 0 0 1 .99-.995zM15.22 8.01c-.24-.73-.8-1.306-1.517-1.611l-.22-.099a.834.834 0 0 0-.98.3l-.014.022a.834.834 0 0 0 .3.98l.098.22c.28.62.24 1.32-.12 1.881l-.014.02a.834.834 0 0 0 .98.3l.22-.098c.71-.305 1.27-.88 1.51-1.61l.015-.022a.834.834 0 0 0-.3-.98l-.098-.22z"/>
+                        </svg>
+                        Componentes Chave do Back-end (Preservados)
+                    </span>
+                    <span x-show="!open" class="text-muted small">▸ Expandir</span>
+                    <span x-show="open" class="text-muted small">▾ Recolher</span>
+                </h4>
+            </div>
+            <div x-show="open" x-transition>
+                <div class="card-body">
+                    <p>
+                        A lógica de negócios e acesso a dados foi 100% preservada do projeto anterior.
+                    </p>
+                    <div class="alert alert-secondary">
+                        <strong>Camada de Persistência (`persistencia/`)</strong>
+                        <ul class="mb-0">
+                            <li>Utiliza `SQLAlchemy Core` para comunicação com o banco.</li>
+                            <li>Inclui um <strong>Repositório Genérico</strong> (`repository.py`) que abstrai as operações CRUD.</li>
+                            <li>Gerencia a conexão (`database.py`) lendo a configuração do `banco.ini`.</li>
+                            <li>Implementa segurança (`security.py`, `auth.py`) com criptografia e hashing `bcrypt`.</li>
+                            <li><strong>Compatibilidade Multi-Banco</strong> (SQLite, PostgreSQL, MySQL, SQL Server) foi mantida.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> <hr class="mt-4">
+    <p class="text-muted small">
+        Desenvolvido como demonstração de arquitetura de software e migração de UI.
+    </p>
+</div>
+{% endblock %}

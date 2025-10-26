@@ -1,0 +1,20 @@
+<tr id="gato-row-{{ gato.id }}">
+    <td>{{ gato.nome_especie }}</td>
+    <td>{{ gato.pais_origem }}</td>
+    <td>{{ gato.temperamento }}</td>
+    <td class="text-end">
+        <button class="btn btn-sm btn-outline-secondary"
+                hx-get="/gatos/{{ gato.id }}/editar"
+                hx-target="#form-container"
+                hx-swap="innerHTML">
+            ✏️
+        </button>
+        <button class="btn btn-sm btn-outline-danger"
+                hx-delete="/gatos/{{ gato.id }}"
+                hx-target="closest tr"
+                hx-swap="outerHTML"
+                hx-confirm="Tem certeza que deseja excluir '{{ gato.nome_especie }}'?">
+            🗑️
+        </button>
+    </td>
+</tr>

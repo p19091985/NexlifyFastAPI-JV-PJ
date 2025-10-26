@@ -1,0 +1,72 @@
+{% set is_edit = usuario is defined %}
+<div class="card bg-body-secondary mb-4">
+    <div class="card-body">
+        <h5 class="card-title">
+            {% if is_edit %}✏️ Editando Usuário{% else %}➕ Novo Usuário{% endif %}
+        </h5>
+        <form
+            {% if is_edit %}
+                hx-put="/usuarios/{{ usuario.login_usuario }}"
+                hx-target="#form-messages"
+                hx-swap="innerHTML"
+            {% else %}
+                hx-post="/usuarios/"
+                hx-target="#form-messages"
+                hx-swap="innerHTML"
+            {% endif %}
+        >
+            <div id="form-messages"></div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="login_usuario" class="form-label">Login (ID) *</label>
+                    <input type="text" class="form-control" id="login_usuario" name="login_usuario"
+                           value="{{ usuario.login_usuario if is_edit else '' }}"
+                           {% if is_edit %}disabled{% endif %} required
+                           autocomplete="off"> 
+                    {% if is_edit %}
+                    <div class="form-text">O login não pode ser alterado após a criação.</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="nome_completo" class="form-label">Nome Completo *</label>
+                    <input type="text" class="form-control" id="nome_completo" name="nome_completo"
+                           value="{{ usuario.nome_completo if is_edit else '' }}" required
+                           autocomplete="off"> 
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="tipo_acesso" class="form-label">Perfil de Acesso</label>
+                    <select class="form-select" id="tipo_acesso" name="tipo_acesso">
+                        {% for perfil in perfis %}
+                        <option value="{{ perfil }}"
+                                {% if is_edit and usuario.tipo_acesso == perfil %}selected{% endif %}>
+                            {{ perfil }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="password" class="form-label">
+                        {% if is_edit %}Nova Senha{% else %}Senha *{% endif %}
+                    </label>
+                    <input type="password" class="form-control" id="password" name="password"
+                           aria-describedby="passwordHelp" {% if not is_edit %}required{% endif %}
+                           autocomplete="new-password"> 
+                    <div id="passwordHelp" class="form-text">
+                        {% if is_edit %}Deixe em branco para manter a senha atual. {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-secondary"
+                        hx-get="/usuarios/cancelar"
+                        hx-target="#form-container"
+                        hx-swap="innerHTML">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>

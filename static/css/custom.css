@@ -1,0 +1,39 @@
+/* /Nexlify_FastAPI/static/css/custom.css */
+body {
+    /* Fonte padrão mais próxima do Streamlit */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    background-color: var(--bs-gray-100); /* Um fundo levemente cinza */
+}
+/* Melhorar a aparência das tabelas */
+.table {
+    font-size: 0.9rem; /* Fonte um pouco menor */
+    border-color: var(--bs-gray-300);
+}
+.table th {
+    font-weight: 600; /* Cabeçalhos um pouco mais fortes */
+    background-color: var(--bs-gray-200); /* Fundo leve para cabeçalho */
+}
+.table tbody tr:hover {
+    background-color: var(--bs-gray-200); /* Destaque suave no hover */
+}
+/* Ajustes no espaçamento da sidebar (opcional) */
+#sidebar .nav-link {
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
+}
+#sidebar .fs-4 { /* Ajusta o título da sidebar */
+    font-weight: 600;
+}
+#sidebar hr {
+    margin-top: 0.8rem;
+    margin-bottom: 0.8rem;
+}
+/* Garante que o conteúdo principal não fique por baixo da sidebar fixa */
+main {
+     padding-top: 1rem;
+     padding-bottom: 1rem;
+}
+/* Opcional: Estilo mais sutil para botões Outline */
+.btn-outline-secondary, .btn-outline-danger {
+    --bs-btn-border-width: 1px;
+}

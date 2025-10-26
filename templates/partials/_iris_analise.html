@@ -1,0 +1,97 @@
+<div class="alert alert-success d-flex align-items-center gap-2" role="alert">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill flex-shrink-0" viewBox="0 0 16 16">
+      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+    </svg>
+    <div>
+        Análise gráfica concluída! Os gráficos interativos são exibidos abaixo.
+    </div>
+</div>
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-light">
+        <h5 class="mb-0">Análise Exploratória de Dados (EDA)</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            {% if plot_jsons and plot_jsons[0] != 'error' %}
+                {% for i in range(plot_jsons|length) %}
+                    <div class="col-lg-6">
+                        <div id="iris-plot-{{ i }}" class="border rounded p-2" style="min-height: 400px;">
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <div class="alert alert-warning">Não foi possível gerar os gráficos EDA. Verifique os logs.</div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<div class="card shadow-sm">
+    <div class="card-header bg-light">
+        <h5 class="mb-0">Análise de Componentes Principais (PCA)</h5>
+    </div>
+    <div class="card-body">
+        {% if pca_json and pca_json != 'error' %}
+            <div id="iris-pca-plot" class="border rounded p-2" style="min-height: 450px;">
+            </div>
+        {% elif pca_json == 'error' %}
+             <div class="alert alert-warning">Não foi possível gerar o gráfico PCA devido a um erro. Verifique os logs.</div>
+        {% else %}
+            <div class="alert alert-info">Gráfico PCA não gerado (dados insuficientes ou erro no cálculo).</div>
+        {% endif %}
+    </div>
+</div>
+<script nonce="{{ request.scope.get('csp_nonce', '') }}">
+(function() {
+    /**
+     * Função auxiliar segura para renderizar gráficos Plotly.
+     * Ela agora lida com todos os tipos de erro e objetos nulos.
+     */
+    function renderPlotly(divId, figObject) {
+        const targetDiv = document.getElementById(divId);
+        if (!targetDiv) {
+            console.error(`Elemento com ID '${divId}' não encontrado para Plotly.`);
+            return;
+        }
+        // Verifica se Plotly.js está carregado
+        if (typeof Plotly === 'undefined') {
+            console.error("Plotly.js não está carregado. (Verifique _base.html)");
+            targetDiv.innerHTML = "<div class='alert alert-danger small p-2 text-center'>Erro: Plotly.js não carregado.</div>";
+            return;
+        }
+        // Validação robusta dos dados do gráfico
+        // O |tojson do Jinja converte None do Python para null do JS
+        if (!figObject || figObject === null || figObject === 'error' || (Array.isArray(figObject) && figObject[0] === 'error')) {
+             console.warn(`Objeto de gráfico inválido ou erro recebido para '${divId}'. Dados:`, figObject);
+             targetDiv.innerHTML = "<div class='alert alert-warning small p-2 text-center'>Gráfico indisponível ou erro na geração.</div>";
+             return;
+        }
+        try {
+            // figObject já é um objeto, não precisa de JSON.parse()
+            Plotly.newPlot(targetDiv, figObject.data, figObject.layout, {
+                responsive: true,
+                displaylogo: false
+            });
+        } catch (e) {
+            console.error(`Falha ao renderizar Plotly em '${divId}':`, e, figObject);
+            targetDiv.innerHTML = "<div class='alert alert-danger small p-2 text-center'>Erro ao renderizar gráfico. Verifique o console.</div>";
+        }
+    }
+    // --- Renderiza Gráficos EDA ---
+    // |tojson|safe cria um Array JavaScript de Objetos
+    const edaPlotObjects = {{ plot_jsons | tojson | safe }};
+    if (edaPlotObjects && Array.isArray(edaPlotObjects) && edaPlotObjects[0] !== 'error') {
+        edaPlotObjects.forEach((figObj, index) => {
+            // Renderiza cada gráfico individualmente
+            renderPlotly(`iris-plot-${index}`, figObj);
+        });
+    } else if (edaPlotObjects && edaPlotObjects[0] === 'error') {
+         console.error("Erro detectado na lista de gráficos EDA vinda do backend.");
+    }
+    // --- Renderiza Gráfico PCA ---
+    // |tojson|safe cria um Objeto JavaScript (ou null, ou a string "error")
+    const pcaObjectData = {{ pca_json | tojson | safe }};
+    renderPlotly('iris-pca-plot', pcaObjectData);
+})();
+</script>

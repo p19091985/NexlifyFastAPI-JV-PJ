@@ -1,0 +1,70 @@
+{% set user = request.session.get("user_info") %}
+<div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary h-100">
+    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+      <span class="fs-4">🚀 Nexlify</span>
+    </a>
+    <hr>
+   <ul class="nav nav-pills flex-column">
+      <li class="nav-item">
+        <a href="/sobre" class="nav-link {% if request.url.path == '/sobre' %}active{% else %}link-body-emphasis{% endif %}" aria-current="page">
+          ℹ️ Sobre
+        </a>
+      </li>
+      <li>
+        <a href="/gatos" class="nav-link {% if request.url.path.startswith('/gatos') %}active{% else %}link-body-emphasis{% endif %}">
+          🐱 Gatos
+        </a>
+      </li>
+      {% if user and user.access_level in ['Administrador Global', 'Gerente de TI'] %}
+      <li>
+        <a href="/usuarios" class="nav-link {% if request.url.path.startswith('/usuarios') %}active{% else %}link-body-emphasis{% endif %}">
+          👤 Usuários
+        </a>
+      </li>
+      {% endif %}
+      <li>
+        <a href="/iris" class="nav-link {% if request.url.path == '/iris' %}active{% else %}link-body-emphasis{% endif %}">
+         📈 Análise Iris
+        </a>
+      </li>
+       <li>
+        <a href="/covertype" class="nav-link {% if request.url.path == '/covertype' %}active{% else %}link-body-emphasis{% endif %}">
+         🌲 Análise Covertype
+        </a>
+      </li>
+      <li>
+        <a href="/modos" class="nav-link {% if request.url.path == '/modos' %}active{% else %}link-body-emphasis{% endif %}">
+          ⚙️ Modos de Config.
+        </a>
+      </li>
+      {% if config.ENABLE_THEME_MENU %}
+      <li>
+        <a href="/theme" class="nav-link {% if request.url.path == '/theme' %}active{% else %}link-body-emphasis{% endif %}">
+          🎨 Editor de Tema
+        </a>
+      </li>
+      {% endif %}
+    </ul>
+    <hr>
+    {% if config.USE_LOGIN %} 
+        {% if user %} 
+        <div class="mb-2">
+            <div>
+                <small class="text-muted">Usuário:</small>
+                <strong class="link-body-emphasis">{{ user.name }}</strong>
+            </div>
+            <div>
+                <small class="text-muted">Perfil:</small>
+                <strong class="link-body-emphasis">{{ user.access_level }}</strong>
+            </div>
+        </div>
+        <a href="/logout" class="btn btn-sm btn-outline-danger w-100" hx-boost="false">
+            🚪 Sair
+        </a>
+        {% else %} 
+        <div class="text-muted small">
+            Não autenticado.
+        </div>
+        {% endif %}
+    {% endif %} 
+</div>

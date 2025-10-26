@@ -1,0 +1,78 @@
+{% extends "_base.html" %}
+{% block title %}Editor de Tema{% endblock %}
+{% block content %}
+<h1>🎨 Editor de Tema</h1>
+<p>Ajuste as configurações visuais da aplicação. As alterações serão salvas em <code>settings.json</code>.</p>
+<p class="text-muted small">Nota: A aplicação dinâmica destas configurações pode variar ou exigir reinicialização, dependendo de como o tema é carregado.</p>
+{% if message %}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+<form action="/theme" method="post" hx-boost="false"> <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Configurações Gerais</div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="theme" class="form-label">Tema Base (ttkbootstrap/Bootswatch)</label>
+                        <select class="form-select" id="theme" name="theme">
+                            {% for theme_name in available_themes %}
+                            <option value="{{ theme_name }}" {% if settings.theme == theme_name %}selected{% endif %}>
+                                {{ theme_name.capitalize() }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="font_family" class="form-label">Família da Fonte</label>
+                        <select class="form-select" id="font_family" name="font_family">
+                             {% for font_name in available_fonts %}
+                            <option value="{{ font_name }}" {% if settings.font_family == font_name %}selected{% endif %}>
+                                {{ font_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="font_size" class="form-label">Tamanho da Fonte (Base)</label>
+                        <input type="number" class="form-control" id="font_size" name="font_size" value="{{ settings.font_size }}" min="8" max="16">
+                    </div>
+                    <div class="mb-3">
+                         <label for="border_width" class="form-label">Largura da Borda (px)</label>
+                         <input type="number" class="form-control" id="border_width" name="border_width" value="{{ settings.border_width }}" min="0" max="5">
+                    </div>
+                    <div class="mb-3">
+                        <label for="border_radius" class="form-label">Raio da Borda (px)</label>
+                        <input type="number" class="form-control" id="border_radius" name="border_radius" value="{{ settings.border_radius }}" min="0" max="20">
+                    </div>
+                     <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" role="switch" id="focus_ring" name="focus_ring" value="true" {% if settings.focus_ring %}checked{% endif %}>
+                        <label class="form-check-label" for="focus_ring">Habilitar Anel de Foco (Focus Ring)</label>
+                    </div>
+                    </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Cores Customizadas</div>
+                <div class="card-body">
+                    {% for color_name, color_value in settings.custom_colors.items() %}
+                    <div class="mb-3 row align-items-center">
+                        <label for="color_{{ color_name }}" class="col-sm-3 col-form-label">{{ color_name.capitalize() }}</label>
+                        <div class="col-sm-9 d-flex align-items-center">
+                            <input type="color" class="form-control form-control-color me-2" id="color_{{ color_name }}" name="color_{{ color_name }}" value="{{ color_value }}" title="Escolha a cor">
+                             <input type="text" class="form-control form-control-sm" value="{{ color_value }}" oninput="document.getElementById('color_{{ color_name }}').value = this.value" aria-label="Valor Hex {{ color_name.capitalize() }}">
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">💾 Salvar Configurações</button>
+    </div>
+</form>
+{% endblock %}

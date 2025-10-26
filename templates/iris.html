@@ -1,0 +1,87 @@
+{% extends "_base.html" %}
+{% block title %}Análise Iris{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-flower1 me-2" viewBox="0 0 16 16">
+        <path d="M8 16a4 4 0 0 0 4-4 4 4 0 0 0 0-8 4 4 0 0 0-8 0 4 4 0 0 0 0 8 4 4 0 0 0 4 4zm3-12.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0zM8.5 8a.5.5 0 0 0-1 0v1.5a.5.5 0 0 0 1 0V8z"/>
+        <path d="M13 8a5 5 0 0 0-5-5 5 5 0 0 0-5 5 5 5 0 0 0 5 5 5 5 0 0 0 5-5zm-5-3.5A1.5 1.5 0 1 1 8 6a1.5 1.5 0 0 1 0-3zM10.38 6.01a.5.5 0 0 0-.38-.38C9.626 5.274 9.074 5 8.5 5h-1c-.574 0-1.126.274-1.5.63a.5.5 0 0 0-.38.38C5.274 6.374 5 6.926 5 7.5v1c0 .574.274 1.126.63 1.5a.5.5 0 0 0 .38.38c.374.356.926.63 1.5.63h1c.574 0 1.126-.274 1.5-.63a.5.5 0 0 0 .38-.38c.356-.374.63-.926.63-1.5v-1c0-.574-.274-1.126-.63-1.5z"/>
+        </svg> Painel de Análise do Dataset Iris
+    </h1>
+    <div id="iris-spinner-global" class="htmx-indicator spinner-border text-secondary spinner-border-sm" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+<div class="alert alert-info d-flex align-items-center gap-2">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle flex-shrink-0" viewBox="0 0 16 16">
+        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+        <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+    </svg>
+    <div>
+        Carregue a tabela para visualização ou inicie a análise gráfica (EDA + PCA). As seções abaixo serão preenchidas dinamicamente.
+    </div>
+</div>
+<div class="mb-3 d-flex gap-2 flex-wrap">
+    <button id="btn-load-table-iris" class="btn btn-primary"
+            hx-get="/iris/tabela"
+            hx-target="#tabela-container-card-body" 
+            hx-indicator="#iris-spinner-global"
+            hx-disable-element="#btn-start-analysis-iris, #btn-load-table-iris"
+            hx-swap="innerHTML">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-table me-1" viewBox="0 0 16 16">
+            <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm15 2h-4v3h4V4zm0 4h-4v3h4V8zm0 4h-4v3h3a1 1 0 0 0 1-1v-2zm-5 3v-3H6v3h4zm-5 0v-3H1v2a1 1 0 0 0 1 1h3zm-4-4h4V8H1v3zm0-4h4V4H1v3zm5-3v3h4V4H6zm4 4H6v3h4V8z"/>
+        </svg>
+        Carregar Tabela
+    </button>
+    <button id="btn-start-analysis-iris" class="btn btn-success"
+            hx-get="/iris/analise"
+            hx-target="#analise-container"
+            hx-indicator="#iris-analysis-loading, #iris-spinner-global" 
+            hx-disable-element="#btn-start-analysis-iris, #btn-load-table-iris"
+            _="on htmx:beforeRequest remove .bi-bar-chart-line add .spinner-border .spinner-border-sm set my innerHTML to ' Analisando...'
+               on htmx:afterRequest remove .spinner-border .spinner-border-sm add .bi-bar-chart-line set my innerHTML to ' Iniciar Análise Gráfica'"
+            hx-swap="innerHTML">
+         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bar-chart-line me-1" viewBox="0 0 16 16">
+            <path d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h1V7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7h1V2zm1 12h2V2h-2v12zm-3 0V7H7v7h2zm-5 0v-3H2v3h2z"/>
+         </svg>
+         Iniciar Análise Gráfica
+    </button>
+</div>
+<div id="iris-analysis-loading" class="htmx-indicator alert alert-warning mt-3">
+    <div class="d-flex align-items-center">
+        <div class="spinner-border spinner-border-sm me-2" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <strong>Gerando gráficos EDA e PCA...</strong> Por favor, aguarde.
+    </div>
+</div>
+<hr class="my-4">
+<div class="card mb-4 shadow-sm" id="tabela-container-card">
+    <div class="card-header bg-light">
+        <h5 class="mb-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye me-1" viewBox="0 0 16 16">
+                <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.618-2.277A13.133 13.133 0 0 1 8 4.5c1.928 0 3.723.63 5.209 1.723A13.133 13.133 0 0 1 14.828 8c-.698 1.18-1.74 2.05-2.909 2.65A13.133 13.133 0 0 1 8 11.5c-1.928 0-3.723-.63-5.209-1.723A13.133 13.133 0 0 1 1.172 8z"/>
+                <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+            </svg>
+            Visualização dos Dados (Amostra)
+        </h5>
+    </div>
+    <div class="card-body" id="tabela-container-card-body">
+        <p class="text-muted fst-italic">Clique em "Carregar Tabela" para visualizar os dados.</p>
+    </div>
+</div>
+<div id="analise-container" class="mb-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-graph-up me-1" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M0 0h1v15h15v1H0V0zm10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.9l-3.613 4.417a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 0 1-.5-.5z"/>
+                </svg>
+                Análise Gráfica (EDA + PCA)
+            </h5>
+        </div>
+        <div class="card-body">
+            <p class="text-muted fst-italic">Clique em "Iniciar Análise Gráfica" para gerar e visualizar os gráficos.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

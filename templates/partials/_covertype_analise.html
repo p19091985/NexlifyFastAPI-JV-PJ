@@ -1,0 +1,71 @@
+{% if warning_sync %}
+<div class="alert alert-warning small d-flex align-items-center gap-2">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-triangle flex-shrink-0" viewBox="0 0 16 16">
+        <path d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"/>
+        <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z"/>
+    </svg>
+    <div>
+        <strong>Aviso:</strong> A análise dos modelos foi executada de forma síncrona. Em produção, use tarefas em segundo plano.
+    </div>
+</div>
+{% endif %}
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h3 class="h5 mb-0">Resultados da Análise Covertype</h3>
+    </div>
+    <div class="card-body">
+        <h4 class="h6 text-primary">Análise Exploratória e Resumo</h4>
+        <div class="accordion accordion-flush mb-4" id="accordionStats">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingInfo">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseInfo" aria-expanded="false" aria-controls="collapseInfo">
+                        Informações das Colunas (Tipos e Nulos)
+                    </button>
+                </h2>
+                <div id="collapseInfo" class="accordion-collapse collapse" aria-labelledby="headingInfo" data-bs-parent="#accordionStats">
+                    <div class="accordion-body p-0"> 
+                         <div class="table-responsive">
+                            {{ info_html | safe }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingDescribe">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDescribe" aria-expanded="false" aria-controls="collapseDescribe">
+                        Resumo Descritivo (Features Numéricas)
+                    </button>
+                </h2>
+                <div id="collapseDescribe" class="accordion-collapse collapse" aria-labelledby="headingDescribe" data-bs-parent="#accordionStats">
+                    <div class="accordion-body p-0">
+                        <div class="table-responsive">
+                            {{ describe_html | safe }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingDist">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDist" aria-expanded="false" aria-controls="collapseDist">
+                         Distribuição das Classes (Alvo: `Cover_Type`)
+                    </button>
+                </h2>
+                <div id="collapseDist" class="accordion-collapse collapse" aria-labelledby="headingDist" data-bs-parent="#accordionStats">
+                    <div class="accordion-body p-0">
+                         <div class="table-responsive">
+                            {{ target_dist_html | safe }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr class="my-4">
+        <h4 class="h6 text-success">Comparação de Modelos de Classificação</h4>
+        <p class="small text-muted mb-2">Modelos treinados em amostra balanceada (~7000 registros). Ordenado pelo melhor F1-Score.</p>
+        {% if results_df and not results_df.empty %}
+        {% endif %}
+        <div class="table-responsive">
+            {{ results_html | safe }}
+        </div>
+    </div> 
+</div> 

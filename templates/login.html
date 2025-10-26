@@ -1,0 +1,36 @@
+{% extends "_base_unauthenticated.html" %} 
+{% block title %}Nexlify Login{% endblock %}
+{% block head_extra %}
+<style>
+  .form-signin {
+    max-width: 400px; /* Largura máxima do formulário */
+    padding: 1rem;
+    width: 100%; /* Garante que o card ocupe o espaço */
+  }
+  /* Adicionado para garantir que o body tenha altura mínima em alguns cenários */
+  body {
+      min-height: 100vh;
+  }
+</style>
+{% endblock %}
+{% block content %}
+<main class="form-signin card"> 
+  <form action="/login" method="POST" hx-boost="false">
+    <h1 class="h3 mb-3 fw-normal text-center">🚀 Nexlify Login</h1>
+    <p class="mb-3 text-center">Por favor, faça o login para continuar</p>
+    {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    <div class="form-floating mb-2">
+      <input type="text" class="form-control" id="username" name="username" placeholder="Usuário" required>
+      <label for="username">Usuário</label>
+    </div>
+    <div class="form-floating mb-3">
+      <input type="password" class="form-control" id="password" name="password" placeholder="Senha" required>
+      <label for="password">Senha</label>
+    </div>
+    <button class="w-100 btn btn-primary" type="submit">Entrar</button>
+    <p class="mt-5 mb-3 text-muted text-center">&copy; 2025</p>
+  </form>
+</main>
+{% endblock %}

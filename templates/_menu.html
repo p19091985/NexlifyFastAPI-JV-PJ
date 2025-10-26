@@ -1,0 +1,51 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-sm">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+            🚀 <span class="fw-bold">Nexlify</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="main-nav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.url.path == '/gatos' %}active{% endif %}" href="/gatos">🐱 Gatos CRUD</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.url.path == '/usuarios' %}active{% endif %}" href="/usuarios">👤 Gestão de Usuários</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle {% if 'analise' in request.url.path %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        📈 Análises
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark">
+                        <li><a class="dropdown-item {% if 'iris' in request.url.path %}active{% endif %}" href="/analise/iris">Análise Iris (EDA+PCA)</a></li>
+                        <li><a class="dropdown-item {% if 'covertype' in request.url.path %}active{% endif %}" href="/analise/covertype">Análise Covertype (Classif.)</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle {% if 'modos' in request.url.path or 'sobre' in request.url.path %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        ℹ️ Sistema
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark">
+                        <li><a class="dropdown-item {% if 'modos' in request.url.path %}active{% endif %}" href="/modos">⚙️ Modos de Operação</a></li>
+                        <li><a class="dropdown-item {% if 'sobre' in request.url.path %}active{% endif %}" href="/sobre">🏗️ Sobre a Arquitetura</a></li>
+                    </ul>
+                </li>
+            </ul>
+            {% if user %}
+            <div class="d-lg-flex text-white align-items-center ms-lg-auto mt-3 mt-lg-0">
+                <div class="text-lg-end me-lg-3">
+                    <div class="fw-bold">{{ user.name }}</div>
+                    <small class="text-muted">{{ user.access_level }}</small>
+                </div>
+            </div>
+            {% endif %}
+        </div> {% if user %}
+        <a href="/logout" class="btn btn-outline-danger ms-2" title="Sair">
+            <i class="bi bi-box-arrow-right d-lg-none"></i>
+            <span class="d-none d-lg-inline">Sair</span>
+        </a>
+        {% endif %}
+    </div>
+</nav>
