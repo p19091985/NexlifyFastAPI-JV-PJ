@@ -1,63 +1,50 @@
-{# templates/partials/_iris_analise_eda.html (CORRIGIDO) #}
-
 <div x-data
      x-init="
-        // Aguarda até que todas as bibliotecas estejam carregadas
         const initCharts = async () => {
-            // Espera um pouco mais para garantir que ApexCharts está carregado
-            await new Promise(resolve => setTimeout(resolve, 200));
-
-            if (typeof ApexCharts === 'undefined') {
-                console.error('ApexCharts.js não está carregado.');
+            try {
+                // Aguarda ApexCharts com Promise global + timeout extra
+                await window.apexChartsLoaded;
+                await new Promise(resolve => setTimeout(resolve, 500));  // Aumentado para 500ms
+                if (typeof ApexCharts === 'undefined') {
+                    throw new Error('ApexCharts ainda não carregado após retry');
+                }
+                const renderChart = (chartId, chartData) => {
+                    const chartDiv = document.querySelector(chartId);
+                    if (!chartDiv) {
+                        console.error(`Elemento ${chartId} não encontrado.`);
+                        return;
+                    }
+                    console.log(`Renderizando ${chartId}:`, chartData);
+                    // Validação mais leniente (aceita se tem series e data)
+                    let isValid = chartData && typeof chartData === 'object' && chartData.series && Array.isArray(chartData.series);
+                    if (!isValid || chartData.error) {
+                        console.warn(`Dados inválidos para ${chartId}:`, chartData);
+                        chartDiv.innerHTML = `<div class='alert alert-warning small p-2 text-center'>${chartData?.error || 'Gráfico indisponível'}</div>`;
+                        return;
+                    }
+                    try {
+                        const chart = new ApexCharts(chartDiv, chartData);
+                        chart.render();
+                        console.log(`✓ ${chartId} renderizado.`);
+                    } catch (e) {
+                        console.error(`Erro no ${chartId}:`, e);
+                        chartDiv.innerHTML = '<div class=\"alert alert-danger small p-2 text-center\">Erro no gráfico. Verifique console.</div>';
+                    }
+                };
+                // Render com delays progressivos
+                renderChart('#chart-eda-1', {{ charts.chart1 | tojson | safe }});
+                setTimeout(() => renderChart('#chart-eda-2', {{ charts.chart2 | tojson | safe }}), 200);
+                setTimeout(() => renderChart('#chart-eda-3', {{ charts.chart3 | tojson | safe }}), 400);
+                setTimeout(() => renderChart('#chart-eda-4', {{ charts.chart4 | tojson | safe }}), 600);
+                setTimeout(() => renderChart('#chart-eda-5', {{ charts.chart5 | tojson | safe }}), 800);
+                setTimeout(() => renderChart('#chart-eda-6', {{ charts.chart6 | tojson | safe }}), 1000);
+            } catch (e) {
+                console.error('Falha geral nos gráficos EDA:', e);
                 document.querySelectorAll('[id^=chart-eda-]').forEach(div => {
-                    div.innerHTML = '<div class=\"alert alert-danger small p-2 text-center\">Erro: ApexCharts.js não carregado.</div>';
+                    div.innerHTML = '<div class=\"alert alert-danger small p-2 text-center\">Erro: ApexCharts não disponível.</div>';
                 });
-                return;
             }
-
-            const renderChart = (chartId, chartData) => {
-                const chartDiv = document.querySelector(chartId);
-                if (!chartDiv) {
-                    console.error(`Elemento ${chartId} não encontrado.`);
-                    return;
-                }
-
-                console.log(`Dados recebidos para ${chartId}:`, chartData);
-
-                // Verificação robusta de dados
-                let isValid = chartData &&
-                             typeof chartData === 'object' &&
-                             !chartData.error &&
-                             chartData.series &&
-                             Array.isArray(chartData.series);
-
-                if (!isValid) {
-                    console.warn(`Dados inválidos para ${chartId}:`, chartData);
-                    const errorMsg = chartData?.error || 'Gráfico indisponível';
-                    chartDiv.innerHTML = `<div class='alert alert-warning small p-2 text-center'>${errorMsg}</div>`;
-                    return;
-                }
-
-                try {
-                    const chart = new ApexCharts(chartDiv, chartData);
-                    chart.render();
-                    console.log(`Gráfico ${chartId} renderizado com sucesso.`);
-                } catch (e) {
-                    console.error(`Erro ao renderizar ${chartId}:`, e);
-                    chartDiv.innerHTML = '<div class=\"alert alert-danger small p-2 text-center\">Erro ao renderizar gráfico.</div>';
-                }
-            };
-
-            // Renderiza gráficos com pequenos delays
-            renderChart('#chart-eda-1', {{ charts.chart1 | tojson | safe }});
-            setTimeout(() => renderChart('#chart-eda-2', {{ charts.chart2 | tojson | safe }}), 100);
-            setTimeout(() => renderChart('#chart-eda-3', {{ charts.chart3 | tojson | safe }}), 200);
-            setTimeout(() => renderChart('#chart-eda-4', {{ charts.chart4 | tojson | safe }}), 300);
-            setTimeout(() => renderChart('#chart-eda-5', {{ charts.chart5 | tojson | safe }}), 400);
-            setTimeout(() => renderChart('#chart-eda-6', {{ charts.chart6 | tojson | safe }}), 500);
         };
-
-        // Inicia o processo
         initCharts();
      "
 >

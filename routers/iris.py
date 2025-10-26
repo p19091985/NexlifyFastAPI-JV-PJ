@@ -1,4 +1,4 @@
-# /Nexlify_FastAPI/routers/iris.py (CORRIGIDO)
+                                              
 
 import pandas as pd
 import numpy as np
@@ -27,10 +27,8 @@ router = APIRouter(
 )
 templates = Jinja2Templates(directory="templates")
 
-# --- Lógica de Carregamento e Preparação de Dados (Corrigida) ---
 CSV_DIR = Path("csv")
 FILE_PATH = CSV_DIR / 'iris_dataset.csv'
-
 
 @lru_cache(maxsize=1)
 def load_and_prepare_data() -> pd.DataFrame:
@@ -49,9 +47,9 @@ def load_and_prepare_data() -> pd.DataFrame:
         try:
             iris = load_iris(as_frame=True)
             df = pd.concat([iris.data, iris.target], axis=1)
-            # CORREÇÃO: Usar nomes consistentes com o dataset original do scikit-learn
+                                                                                      
             df.columns = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width', 'target']
-            # Adiciona a coluna species
+                                       
             target_names = {0: 'setosa', 1: 'versicolor', 2: 'virginica'}
             df['species'] = df['target'].map(target_names)
             df.to_csv(FILE_PATH, index=False)
@@ -60,10 +58,9 @@ def load_and_prepare_data() -> pd.DataFrame:
             logger.error(f"Falha crítica: Não foi possível baixar ou salvar o dataset Iris: {e}", exc_info=True)
             raise HTTPException(status_code=500, detail="Erro ao baixar ou salvar o dataset Iris.")
 
-    # Carrega o dataset do CSV
     try:
         df = pd.read_csv(FILE_PATH)
-        # Garante que a coluna species existe
+                                             
         if 'species' not in df.columns and 'target' in df.columns:
             target_names = {0: 'setosa', 1: 'versicolor', 2: 'virginica'}
             df['species'] = df['target'].map(target_names).fillna('unknown')
@@ -72,9 +69,6 @@ def load_and_prepare_data() -> pd.DataFrame:
     except Exception as e:
         logger.error(f"Erro ao ler o CSV {FILE_PATH}: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Erro ao ler arquivo {FILE_PATH.name}.")
-
-
-# --- Conversores de Dados para ApexCharts (Corrigidos) ---
 
 def _safe_json_dumps(data):
     """Converte dados (incluindo numpy) para JSON seguro."""
@@ -93,14 +87,13 @@ def _safe_json_dumps(data):
 
     return json.dumps(data, cls=NpEncoder)
 
-
 def _get_apex_scatter(df: pd.DataFrame, x_col: str, y_col: str, title: str) -> dict:
     """Formata dados de scatter plot para ApexCharts."""
     try:
         series = []
         for species in df['species'].unique():
             species_df = df[df['species'] == species]
-            # Formato [x, y]
+                            
             data = [[round(x, 2), round(y, 2)] for x, y in zip(species_df[x_col], species_df[y_col])]
             series.append({'name': species, 'data': data})
 
@@ -117,7 +110,6 @@ def _get_apex_scatter(df: pd.DataFrame, x_col: str, y_col: str, title: str) -> d
         logger.error(f"Erro ao criar scatter plot {title}: {e}")
         return {'error': f'Erro ao gerar gráfico: {str(e)}'}
 
-
 def _get_apex_bar(df_agg: pd.DataFrame, x_col: str, y_col: str, title: str) -> dict:
     """Formata dados de bar chart para ApexCharts."""
     try:
@@ -133,7 +125,6 @@ def _get_apex_bar(df_agg: pd.DataFrame, x_col: str, y_col: str, title: str) -> d
     except Exception as e:
         logger.error(f"Erro ao criar bar chart {title}: {e}")
         return {'error': f'Erro ao gerar gráfico: {str(e)}'}
-
 
 def _get_apex_boxplot(df: pd.DataFrame, x_col: str, y_col: str, title: str) -> dict:
     """Formata dados de box plot para ApexCharts."""
@@ -164,7 +155,6 @@ def _get_apex_boxplot(df: pd.DataFrame, x_col: str, y_col: str, title: str) -> d
         logger.error(f"Erro ao criar boxplot {title}: {e}")
         return {'error': f'Erro ao gerar gráfico: {str(e)}'}
 
-
 def _get_apex_histogram(df: pd.DataFrame, x_col: str, title: str) -> dict:
     """Formata dados de histograma para ApexCharts."""
     try:
@@ -188,48 +178,47 @@ def _get_apex_histogram(df: pd.DataFrame, x_col: str, title: str) -> dict:
         logger.error(f"Erro ao criar histograma {title}: {e}")
         return {'error': f'Erro ao gerar gráfico: {str(e)}'}
 
-
 def _get_apex_pca_3d(df: pd.DataFrame, title: str) -> dict:
-    """Formata dados do PCA 3D para ApexCharts."""
+    """Formata dados do PCA 2D (PC1 vs PC2) para ApexCharts. (Corrigido para 2D scatter)."""
     try:
-        # Seleciona apenas colunas numéricas para PCA
+                                                     
         numeric_cols = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width']
         X = df[numeric_cols].dropna()
         y_species = df.loc[X.index, 'species']
 
-        if len(X) < 3:
-            logger.warning("Dados insuficientes para PCA 3D")
+        if len(X) < 2:
+            logger.warning("Dados insuficientes para PCA 2D")
             return {'error': 'Dados insuficientes para PCA'}
 
-        pca = PCA(n_components=3)
+        pca = PCA(n_components=2)                           
         X_reduced = pca.fit_transform(X)
 
-        pca_df = pd.DataFrame(X_reduced, columns=['PC1', 'PC2', 'PC3'])
+        var_explained = f"{title} (Var. PC1: {pca.explained_variance_ratio_[0]:.1%}, PC2: {pca.explained_variance_ratio_[1]:.1%})"
+
+        pca_df = pd.DataFrame(X_reduced, columns=['PC1', 'PC2'])
         pca_df['species'] = y_species.reset_index(drop=True)
 
         series = []
         for species in pca_df['species'].unique():
             species_df = pca_df[pca_df['species'] == species]
-            # Formato [x, y, z] para scatter 3D
-            data = species_df[['PC1', 'PC2', 'PC3']].round(3).values.tolist()
+                                            
+            data = [[round(x, 3), round(y, 3)] for x, y in zip(species_df['PC1'], species_df['PC2'])]
             series.append({'name': species, 'data': data})
 
         chart_data = {
             'series': series,
-            'chart': {'type': 'scatter', 'height': 450, 'zoom': {'enabled': True}},
-            'title': {'text': title, 'align': 'left'},
+            'chart': {'type': 'scatter', 'height': 450, 'zoom': {'enabled': True, 'type': 'xy'}},
+            'title': {'text': var_explained, 'align': 'left'},
             'xaxis': {'title': {'text': 'PC1'}},
             'yaxis': {'title': {'text': 'PC2'}},
             'legend': {'position': 'top'},
             'markers': {'size': 5}
         }
+        logger.info(f"PCA 2D gerado com sucesso: {len(X)} amostras, variância: {pca.explained_variance_ratio_}")
         return json.loads(_safe_json_dumps(chart_data))
     except Exception as e:
-        logger.error(f"Erro ao criar PCA 3D: {e}")
+        logger.error(f"Erro ao criar PCA 2D: {e}")
         return {'error': f'Erro ao gerar PCA: {str(e)}'}
-
-
-# --- Rotas FastAPI (Corrigidas) ---
 
 @router.get("/", response_class=HTMLResponse)
 async def get_iris_page(request: Request):
@@ -237,7 +226,6 @@ async def get_iris_page(request: Request):
     settings = get_current_settings()
     context = {"request": request, "settings": settings, "config": config}
     return templates.TemplateResponse("iris.html", context)
-
 
 @router.get("/tabela", response_class=HTMLResponse)
 async def get_tabela_iris(request: Request, page: int = Query(1, ge=1)):
@@ -266,7 +254,6 @@ async def get_tabela_iris(request: Request, page: int = Query(1, ge=1)):
         logger.error(f"Erro ao carregar tabela: {e}")
         return HTMLResponse(f"<div class='alert alert-danger'>Erro ao carregar dados: {str(e)}</div>", status_code=500)
 
-
 @router.get("/eda_charts", response_class=HTMLResponse)
 async def get_eda_charts(request: Request):
     """Gera gráficos EDA e retorna parcial."""
@@ -274,11 +261,9 @@ async def get_eda_charts(request: Request):
         df = load_and_prepare_data()
         logger.info(f"Colunas disponíveis para EDA: {list(df.columns)}")
 
-        # Contagem por espécie
         df_count = df['species'].value_counts().reset_index()
         df_count.columns = ['species', 'count']
 
-        # Gera todos os gráficos
         chart_data = {
             "chart1": _get_apex_scatter(df, 'sepal_length', 'sepal_width', 'Comprimento vs Largura da Sépala'),
             "chart2": _get_apex_scatter(df, 'petal_length', 'petal_width', 'Comprimento vs Largura da Pétala'),
@@ -288,7 +273,6 @@ async def get_eda_charts(request: Request):
             "chart6": _get_apex_histogram(df, 'sepal_width', 'Distribuição da Largura da Sépala')
         }
 
-        # Log para debug
         for i, (key, chart) in enumerate(chart_data.items(), 1):
             if 'error' in str(chart):
                 logger.warning(f"Gráfico {i} ({key}) com erro: {chart}")
@@ -303,17 +287,18 @@ async def get_eda_charts(request: Request):
         return HTMLResponse(f"<div class='alert alert-danger'>Erro ao gerar gráficos EDA: {str(e)}</div>",
                             status_code=500)
 
-
 @router.get("/pca_chart", response_class=HTMLResponse)
 async def get_pca_chart(request: Request):
     """Gera gráfico PCA e retorna parcial."""
     try:
         df = load_and_prepare_data()
-        chart_data = _get_apex_pca_3d(df, 'PCA 3D - Visualização das Espécies')
+        chart_data = _get_apex_pca_3d(df, 'PCA 2D - Visualização das Espécies')
+
+        logger.info(f"Dados PCA enviados: {chart_data}")                  
 
         context = {"request": request, "chart_pca": chart_data}
         if isinstance(chart_data, dict) and 'error' in str(chart_data):
-            context["error_message"] = "Não foi possível gerar o gráfico PCA 3D"
+            context["error_message"] = "Não foi possível gerar o gráfico PCA 2D"
 
         return templates.TemplateResponse("partials/_iris_analise_pca.html", context)
     except Exception as e:

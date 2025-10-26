@@ -1,6 +1,4 @@
-{#--- Helpers Jinja para o tema ---#}
 {% set theme_mode = 'dark' if settings.theme in ['darkly', 'slate', 'solar', 'superhero', 'vapor', 'cyborg'] else 'light' %}
-{# Função helper (macro) para converter px para rem string #}
 {% macro px_to_rem(px_value, default_rem='0.375rem', base_font=16) %}
     {% if px_value is defined and px_value is number %}
         {{ (px_value | float / base_font) | round(3) }}rem
@@ -8,7 +6,6 @@
         {{ default_rem }}
     {% endif %}
 {% endmacro %}
-{# Função helper (macro) para converter hex para 'R,G,B' string #}
 {% macro hex_to_rgb_str(hex_color, default_rgb='0,0,0') %}
     {% set h = hex_color | replace('#', '') %}
     {% if h and h | length == 6 %}
@@ -16,28 +13,22 @@
     {% elif h and h | length == 3 %}
         {{ (h[0]*2) | int(base=16) }},{{ (h[1]*2) | int(base=16) }},{{ (h[2]*2) | int(base=16) }}
     {% else %}
-        {{ default_rgb }} {# Retorna preto se inválido #}
+        {{ default_rgb }} 
     {% endif %}
 {% endmacro %}
-
-{#--- Calcula valores com base nas settings ---#}
 {% set border_radius_rem = px_to_rem(settings.border_radius, default_rem='0.375rem') %}
 {% set border_width_px = (settings.border_width | string) + 'px' if settings.border_width is defined and settings.border_width is number else '1px' %}
 {% set font_size_rem = px_to_rem(settings.font_size, default_rem='1rem') %}
 {% set primary_rgb_val = hex_to_rgb_str(settings.custom_colors.primary, default_rgb='13,110,253') %}
-
 <!doctype html>
 <html lang="pt-br" data-bs-theme="{{ theme_mode }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Nexlify FastAPI{% endblock %}</title>
-
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
     <link href="/static/css/custom.css" rel="stylesheet">
-
     {% include "_theme_style.html" %}
-
     <style>
         /* Estilos básicos para layout da sidebar (mantido) */
         body { display: flex; min-height: 100vh; background-color: var(--bs-secondary-bg); }
@@ -46,17 +37,14 @@
         @media (max-width: 991.98px) { #sidebar { transform: translateX(-100%); z-index: 1045; } #sidebar.show { transform: translateX(0); } main { margin-left: 0; width: 100%; } #sidebar-toggler { display: block !important; } }
         #sidebar-toggler { position: fixed; top: 10px; left: 10px; z-index: 1050; display: none; }
         .htmx-indicator { opacity: 0; transition: opacity 200ms ease-in; } .htmx-request .htmx-indicator { opacity: 1; } .htmx-request.htmx-indicator { opacity: 1; }
-
         /* Estilo para indicador de carregamento de bibliotecas */
         .lib-status { font-size: 0.875rem; }
     </style>
 </head>
 <body>
-
     <button class="btn btn-light d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas" id="sidebar-toggler">
         ☰
     </button>
-
     <div class="offcanvas-lg offcanvas-start bg-body-tertiary" tabindex="-1" id="sidebarOffcanvas" aria-labelledby="sidebarOffcanvasLabel">
       <div class="offcanvas-header d-lg-none">
             <h5 class="offcanvas-title" id="sidebarOffcanvasLabel">Menu</h5>
@@ -68,45 +56,55 @@
            </div>
        </div>
     </div>
-
     <main>
         <!-- Indicador de status das bibliotecas (pode ser removido depois que funcionar) -->
-        <div class="alert alert-info lib-status mb-3 py-2" role="alert">
+        <!-- <div class="alert alert-info lib-status mb-3 py-2" role="alert">
             <small>
                 <strong>Status:</strong>
                 <span id="apex-status" class="badge bg-secondary">Verificando ApexCharts...</span>
                 <span id="alpine-status" class="badge bg-secondary">Verificando Alpine.js...</span>
                 <span id="htmx-status" class="badge bg-secondary">Verificando HTMX...</span>
             </small>
-        </div>
-
+        </div> -->
         {% block content %}{% endblock %}
     </main>
-
-    <!-- ORDEM CORRETA DOS SCRIPTS - APEXCHARTS PRIMEIRO! -->
-    <!-- 1. ApexCharts PRIMEIRO (para garantir que está disponível quando Alpine inicializar) -->
+    <!-- SCRIPTS: ORDEM CRÍTICA - APEXCHARTS SEM DEFER PARA GARANTIR LOAD ANTES DE ALPINE -->
+    <!-- 1. ApexCharts PRIMEIRO e SÍNCRONO -->
     <script src="/static/js/apexcharts.min.js"></script>
-
-    <!-- 2. Alpine.js DEPOIS -->
-    <script src="/static/js/alpine.min.js" defer></script>
-
-    <!-- 3. Bootstrap -->
+    <!-- 2. Bootstrap (SÍNCRONO) -->
     <script src="/static/js/bootstrap.bundle.min.js"></script>
-
-    <!-- 4. HTMX -->
+    <!-- 3. HTMX -->
     <script src="/static/js/htmx.min.js"></script>
-
-    <!-- 5. Plotly (se necessário) -->
+    <!-- 4. Plotly (se necessário) -->
     <script src="/static/js/plotly-latest.min.js"></script>
-
-    <!-- 6. Hyperscript (se necessário) -->
+    <!-- 5. Hyperscript (se necessário) -->
     <script src="/static/js/_hyperscript.min.js"></script>
-
+    <!-- 6. Alpine.js POR ÚLTIMO, SEM DEFER PARA SYNC COM GRÁFICOS -->
+    <script src="/static/js/alpine.min.js"></script>
     <script nonce="{{ request.scope.get('csp_nonce', '') }}">
-        // Script da Sidebar (para modo mobile/offcanvas)
+        // Global Promise para aguardar ApexCharts (usado nos templates)
+        window.apexChartsLoaded = new Promise((resolve, reject) => {
+            if (typeof ApexCharts !== 'undefined') {
+                console.log('✓ ApexCharts já carregado localmente');
+                resolve();
+                return;
+            }
+            console.warn('ApexCharts não encontrado, carregando via CDN...');
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/apexcharts@3.44.0/dist/apexcharts.min.js';  // Versão mais recente
+            script.onload = () => {
+                console.log('✓ ApexCharts carregado via CDN');
+                resolve();
+            };
+            script.onerror = () => {
+                console.error('✗ Falha no CDN ApexCharts');
+                reject(new Error('ApexCharts falhou ao carregar'));
+            };
+            document.head.appendChild(script);
+        });
+        // Sidebar script (inalterado)
         const sidebar = document.getElementById('sidebar');
         const sidebarOffcanvas = document.getElementById('sidebarOffcanvas');
-
         if (sidebarOffcanvas && sidebar) {
             sidebarOffcanvas.addEventListener('show.bs.offcanvas', () => {
                 if (window.innerWidth < 992) {
@@ -131,57 +129,14 @@
              adjustSidebarVisibility();
              window.addEventListener('resize', adjustSidebarVisibility);
         }
-
-        // Verificação se as bibliotecas estão carregadas
+        // Verificação DOMContentLoaded (simplificado, sem status alert)
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Verificando bibliotecas...');
-
-            // ApexCharts
-            const apexStatus = document.getElementById('apex-status');
-            if (typeof ApexCharts !== 'undefined') {
-                apexStatus.className = 'badge bg-success';
-                apexStatus.textContent = 'ApexCharts ✓';
-                console.log('✓ ApexCharts carregado');
-            } else {
-                apexStatus.className = 'badge bg-danger';
-                apexStatus.textContent = 'ApexCharts ✗';
-                console.error('✗ ApexCharts NÃO carregado');
-
-                // Tenta carregar via CDN automaticamente
-                console.warn('Tentando carregar ApexCharts via CDN...');
-                const script = document.createElement('script');
-                script.src = 'https://cdn.jsdelivr.net/npm/apexcharts@3.35.0/dist/apexcharts.min.js';
-                script.onload = function() {
-                    console.log('ApexCharts carregado via CDN com sucesso');
-                    apexStatus.className = 'badge bg-warning';
-                    apexStatus.textContent = 'ApexCharts (CDN) ✓';
-                };
-                document.head.appendChild(script);
-            }
-
-            // Alpine.js
-            const alpineStatus = document.getElementById('alpine-status');
-            if (typeof Alpine !== 'undefined') {
-                alpineStatus.className = 'badge bg-success';
-                alpineStatus.textContent = 'Alpine.js ✓';
-                console.log('✓ Alpine.js carregado');
-            } else {
-                alpineStatus.className = 'badge bg-danger';
-                alpineStatus.textContent = 'Alpine.js ✗';
-                console.error('✗ Alpine.js NÃO carregado');
-            }
-
-            // HTMX
-            const htmxStatus = document.getElementById('htmx-status');
-            if (typeof htmx !== 'undefined') {
-                htmxStatus.className = 'badge bg-success';
-                htmxStatus.textContent = 'HTMX ✓';
-                console.log('✓ HTMX carregado');
-            } else {
-                htmxStatus.className = 'badge bg-danger';
-                htmxStatus.textContent = 'HTMX ✗';
-                console.error('✗ HTMX NÃO carregado');
-            }
+            console.log('Página carregada - aguardando ApexCharts...');
+            window.apexChartsLoaded.then(() => {
+                console.log('✓ Todos os assets prontos');
+            }).catch(err => {
+                console.error('✗ Erro crítico em assets:', err);
+            });
         });
     </script>
 </body>

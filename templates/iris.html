@@ -1,18 +1,14 @@
 {% extends "_base.html" %}
-
 {% block title %}Análise Iris{% endblock %}
-
 {% block content %}
 <div x-data="{ tab: 'tabela' }">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1>📈 Painel de Análise do Dataset Iris</h1>
-
         <div class="htmx-indicator spinner-border text-primary" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
     </div>
     <p>Use as abas abaixo para explorar os dados, similar à interface do Streamlit.</p>
-
     <ul class="nav nav-tabs mb-3">
         <li class="nav-item">
             <a class="nav-link" href="#"
@@ -36,7 +32,6 @@
             </a>
         </li>
     </ul>
-
     <div x-show="tab === 'tabela'"
          id="tabela-container"
          hx-get="/iris/tabela"
@@ -48,7 +43,6 @@
             </div>
          </div>
     </div>
-
     <div x-show="tab === 'eda'"
          id="eda-container"
          hx-get="/iris/eda_charts"
@@ -60,7 +54,6 @@
             </div>
          </div>
     </div>
-
     <div x-show="tab === 'pca'"
          id="pca-container"
          hx-get="/iris/pca_chart"
@@ -73,7 +66,6 @@
          </div>
     </div>
 </div>
-
 <script>
 // Verificação adicional para garantir que tudo está funcionando
 document.addEventListener('DOMContentLoaded', function() {
@@ -81,7 +73,6 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('ApexCharts disponível:', typeof ApexCharts !== 'undefined');
     console.log('Alpine disponível:', typeof Alpine !== 'undefined');
     console.log('HTMX disponível:', typeof htmx !== 'undefined');
-
     // Se ApexCharts não estiver carregado, tente carregar do CDN como fallback
     if (typeof ApexCharts === 'undefined') {
         console.warn('ApexCharts não encontrado localmente, tentando CDN...');
