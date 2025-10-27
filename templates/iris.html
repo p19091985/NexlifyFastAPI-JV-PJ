@@ -3,88 +3,74 @@
 {% block content %}
 <div>
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1>📈 Painel de Análise do Dataset Iris</h1>
+        <h1>📈 Painel de Análise do Dataset Iris</h1> 
         <div class="htmx-indicator spinner-border text-primary" role="status">
              <span class="visually-hidden">Loading...</span>
         </div>
     </div>
-    <p>Use as abas abaixo para explorar os dados, similar à interface do Streamlit.</p>
-
+    <p>Use as abas abaixo para explorar os dados, similar à interface do Streamlit.</p> 
     <ul class="nav nav-tabs mb-3" id="irisTab" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="tabela-tab" data-bs-toggle="tab" data-bs-target="#tabela-container" type="button" role="tab" aria-controls="tabela-container" aria-selected="true">
-                Visualização dos Dados
+                 Visualização dos Dados 
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="eda-tab" data-bs-toggle="tab" data-bs-target="#eda-container" type="button" role="tab" aria-controls="eda-container" aria-selected="false">
-                Análise Gráfica (EDA)
+            <button class="nav-link" id="eda-tab" data-bs-toggle="tab" data-bs-target="#eda-container-wrapper" type="button" role="tab" aria-controls="eda-container-wrapper" aria-selected="false"> 
+                Análise Gráfica (EDA) 
             </button>
         </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="pca-tab" data-bs-toggle="tab" data-bs-target="#pca-container" type="button" role="tab" aria-controls="pca-container" aria-selected="false">
-                Análise de Componentes Principais (PCA)
+        <li class="nav-item" role="presentation"> 
+            <button class="nav-link" id="pca-tab" data-bs-toggle="tab" data-bs-target="#pca-container-wrapper" type="button" role="tab" aria-controls="pca-container-wrapper" aria-selected="false"> 
+                Análise de Componentes Principais (PCA) 
             </button>
         </li>
     </ul>
-
     <div class="tab-content" id="irisTabContent">
         <div class="tab-pane fade show active" id="tabela-container" role="tabpanel" aria-labelledby="tabela-tab"
              hx-get="/iris/tabela"
              hx-trigger="load"
-             hx-swap="innerHTML">
+             hx-swap="innerHTML"> 
              <div class="text-center p-5">
                  <div class="spinner-border" role="status">
-                    <span class="visually-hidden">Carregando tabela...</span>
+                     <span class="visually-hidden">Carregando tabela...</span> 
                 </div>
              </div>
         </div>
-        <div class="tab-pane fade" id="eda-container" role="tabpanel" aria-labelledby="eda-tab"
+        <div class="tab-pane fade" id="eda-container-wrapper" role="tabpanel" aria-labelledby="eda-tab"
              hx-get="/iris/eda_charts"
              hx-trigger="load"
-             hx-swap="innerHTML">
-             <div class="text-center p-5">
+             hx-swap="innerHTML"> 
+             <div class="text-center p-5"> 
                 <div class="spinner-border" role="status">
-                    <span class="visually-hidden">Carregando gráficos EDA...</span>
+                    <span class="visually-hidden">Carregando gráficos EDA...</span> 
                 </div>
              </div>
         </div>
-        <div class="tab-pane fade" id="pca-container" role="tabpanel" aria-labelledby="pca-tab"
-             hx-get="/iris/pca_chart"
+        <div class="tab-pane fade" id="pca-container-wrapper" role="tabpanel" aria-labelledby="pca-tab"
+             hx-get="/iris/pca_chart" 
              hx-trigger="load"
              hx-swap="innerHTML">
-             <div class="text-center p-5">
+             <div class="text-center p-5"> 
                 <div class="spinner-border" role="status">
                     <span class="visually-hidden">Carregando gráfico PCA...</span>
-                </div>
+                </div> 
              </div>
         </div>
     </div>
 </div>
-
 <script>
-// Verificação adicional para garantir que tudo está funcionando
 document.addEventListener('DOMContentLoaded', function() {
+    // ... (inalterado) ... 
     console.log('Página Iris carregada');
     console.log('ApexCharts disponível:', typeof ApexCharts !== 'undefined');
     console.log('HTMX disponível:', typeof htmx !== 'undefined');
-    // Se ApexCharts não estiver carregado, tente carregar do CDN como fallback
     if (typeof ApexCharts === 'undefined') {
         console.warn('ApexCharts não encontrado localmente, tentando CDN...');
         const script = document.createElement('script');
         script.src = 'https://cdn.jsdelivr.net/npm/apexcharts@3.35.0/dist/apexcharts.min.js';
-        script.onload = function() {
-            console.log('ApexCharts carregado via CDN com sucesso');
-            // Atualiza o status
-            const apexStatus = document.getElementById('apex-status');
-            if (apexStatus) {
-                apexStatus.className = 'badge bg-warning';
-                apexStatus.textContent = 'ApexCharts (CDN) ✓';
-            }
-        };
-        script.onerror = function() {
-            console.error('Falha ao carregar ApexCharts via CDN');
-        };
+        script.onload = function() { console.log('ApexCharts carregado via CDN com sucesso'); /* ... */ };
+        script.onerror = function() { console.error('Falha ao carregar ApexCharts via CDN'); };
         document.head.appendChild(script);
     }
 });

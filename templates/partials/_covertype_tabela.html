@@ -1,6 +1,7 @@
-<h3 class="h5">Visualização dos Dados</h3>
+{% import '_macros.html' as macros %}
+<h3 class="h5">Visualização dos Dados Brutos</h3>
 <div class="table-responsive">
-    <table class="table table-sm table-striped">
+    <table class="table table-sm table-striped table-hover">
         <thead>
             <tr>
                 {% for header in headers %}
@@ -19,27 +20,13 @@
         </tbody>
     </table>
 </div>
-<div class="d-flex justify-content-between align-items-center">
-    <p class="text-muted mb-0">
-        Mostrando {{ start_idx }}-{{ end_idx }} de {{ total_rows }} registros |
-        Página {{ page }} de {{ total_pages }}
-    </p>
-    <div>
-        <button class="btn btn-outline-secondary btn-sm"
-                hx-get="/covertype/tabela?page={{ page - 1 }}"
-                hx-target="#tabela-container"
-                hx-indicator="#covertype-spinner"
-                hx-swap="innerHTML"
-                {% if page <= 1 %}disabled{% endif %}>
-            Anterior
-        </button>
-        <button class="btn btn-outline-secondary btn-sm"
-                hx-get="/covertype/tabela?page={{ page + 1 }}"
-                hx-target="#tabela-container"
-                hx-indicator="#covertype-spinner"
-                hx-swap="innerHTML"
-                {% if page >= total_pages %}disabled{% endif %}>
-            Próximo
-        </button>
-    </div>
-</div>
+{{ macros.render_pagination(
+    current_page=page,
+    total_pages=total_pages,
+    target_selector="#tabela-container-card-body",
+    hx_get_url_base="/covertype/tabela",
+    indicator_selector="#covertype-spinner"
+) }}
+<p class="text-muted mb-0 small mt-1">
+    Mostrando {{ start_idx }}-{{ end_idx }} de {{ total_rows }} registros
+</p>

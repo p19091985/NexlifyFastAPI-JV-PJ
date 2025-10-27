@@ -13,7 +13,7 @@
     {% elif h and h | length == 3 %}
         {{ (h[0]*2) | int(base=16) }},{{ (h[1]*2) | int(base=16) }},{{ (h[2]*2) | int(base=16) }}
     {% else %}
-        {{ default_rgb }} 
+        {{ default_rgb }}
     {% endif %}
 {% endmacro %}
 {% set border_radius_rem = px_to_rem(settings.border_radius, default_rem='0.375rem') %}
@@ -30,14 +30,10 @@
     <link href="/static/css/custom.css" rel="stylesheet">
     {% include "_theme_style.html" %}
     <style>
-        /* Estilos básicos para layout da sidebar (mantido) */
-        body { display: flex; min-height: 100vh; background-color: var(--bs-secondary-bg); }
-        #sidebar { width: 280px; position: fixed; top: 0; left: 0; bottom: 0; z-index: 1030; border-right: var(--bs-border-width) solid var(--bs-border-color); transition: transform 0.3s ease-in-out; background-color: var(--bs-tertiary-bg); }
-        main { margin-left: 280px; padding: 1.5rem; flex-grow: 1; width: calc(100% - 280px); background-color: var(--bs-body-bg); }
-        @media (max-width: 991.98px) { #sidebar { transform: translateX(-100%); z-index: 1045; } #sidebar.show { transform: translateX(0); } main { margin-left: 0; width: 100%; } #sidebar-toggler { display: block !important; } }
-        #sidebar-toggler { position: fixed; top: 10px; left: 10px; z-index: 1050; display: none; }
-        .htmx-indicator { opacity: 0; transition: opacity 200ms ease-in; } .htmx-request .htmx-indicator { opacity: 1; } .htmx-request.htmx-indicator { opacity: 1; }
-        /* Estilo para indicador de carregamento de bibliotecas */
+        /* Estilos inline mínimos remanescentes (opcional) */
+        .htmx-indicator { opacity: 0; transition: opacity 200ms ease-in; }
+        .htmx-request .htmx-indicator { opacity: 1; }
+        .htmx-request.htmx-indicator { opacity: 1; }
         .lib-status { font-size: 0.875rem; }
     </style>
 </head>
@@ -51,76 +47,48 @@
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#sidebarOffcanvas" aria-label="Close"></button>
        </div>
        <div class="offcanvas-body p-0">
-
            <div id="sidebar">
                {% include "_sidebar.html" %}
            </div>
        </div>
     </div>
     <main>
-
          {% block content %}{% endblock %}
     </main>
     <script src="/static/js/apexcharts.min.js"></script>
     <script src="/static/js/bootstrap.bundle.min.js"></script>
     <script src="/static/js/htmx.min.js"></script>
-
+    <script src="/static/js/charts_initializer.js" defer></script>
     <script nonce="{{ request.scope.get('csp_nonce', '') }}">
-        // Global Promise para aguardar ApexCharts (usado nos templates)
+        // Promise global para ApexCharts - Assume carregamento local
         window.apexChartsLoaded = new Promise((resolve, reject) => {
+            // Verifica se ApexCharts foi carregado pelo script local síncrono
             if (typeof ApexCharts !== 'undefined') {
-                console.log('✓ ApexCharts já carregado localmente');
+                console.log('✓ ApexCharts carregado localmente.');
                 resolve();
-                return;
+            } else {
+                // Se não foi carregado localmente, rejeita a promise.
+                // O script charts_initializer.js tratará o erro.
+                console.error('✗ ApexCharts não encontrado localmente. Verifique se o arquivo /static/js/apexcharts.min.js existe e está correto.');
+                reject(new Error('ApexCharts falhou ao carregar localmente'));
             }
-            console.warn('ApexCharts não encontrado, carregando via CDN...');
-            const script = document.createElement('script');
-            script.src = 'https://cdn.jsdelivr.net/npm/apexcharts@3.44.0/dist/apexcharts.min.js';  // Versão mais recente
-            script.onload = () => {
-                console.log('✓ ApexCharts carregado via CDN');
-                resolve();
-            };
-            script.onerror = () => {
-                console.error('✗ Falha no CDN ApexCharts');
-                reject(new Error('ApexCharts falhou ao carregar'));
-            };
-            document.head.appendChild(script);
         });
-        // Sidebar script (inalterado)
+        // Script da Sidebar (mantido)
         const sidebar = document.getElementById('sidebar');
         const sidebarOffcanvas = document.getElementById('sidebarOffcanvas');
         if (sidebarOffcanvas && sidebar) {
-            sidebarOffcanvas.addEventListener('show.bs.offcanvas', () => {
-                if (window.innerWidth < 992) {
-                     sidebar.classList.add('show');
-                }
-            });
-            sidebarOffcanvas.addEventListener('hide.bs.offcanvas', () => {
-                 if (window.innerWidth < 992) {
-                     sidebar.classList.remove('show');
-                 }
-            });
-            function adjustSidebarVisibility() {
-                 if (window.innerWidth >= 992) {
-                     sidebar.classList.add('show');
-                     sidebarOffcanvas.classList.remove('show');
-                 } else {
-                      if (!sidebarOffcanvas.classList.contains('show')) {
-                           sidebar.classList.remove('show');
-                      }
-                 }
-             }
+             sidebarOffcanvas.addEventListener('show.bs.offcanvas', () => { if (window.innerWidth < 992) { sidebar.classList.add('show'); } });
+             sidebarOffcanvas.addEventListener('hide.bs.offcanvas', () => { if (window.innerWidth < 992) { sidebar.classList.remove('show'); } });
+             function adjustSidebarVisibility() { if (window.innerWidth >= 992) { sidebar.classList.add('show'); sidebarOffcanvas.classList.remove('show'); } else { if (!sidebarOffcanvas.classList.contains('show')) { sidebar.classList.remove('show'); } } }
              adjustSidebarVisibility();
              window.addEventListener('resize', adjustSidebarVisibility);
         }
-        // Verificação DOMContentLoaded (simplificado, sem status alert)
+        // Script DOMContentLoaded (mantido)
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Página carregada - aguardando ApexCharts...');
-            window.apexChartsLoaded.then(() => {
-                console.log('✓ Todos os assets prontos');
-            }).catch(err => {
-                 console.error('✗ Erro crítico em assets:', err);
-            });
+            console.log('Página carregada - verificando ApexCharts...');
+            window.apexChartsLoaded
+                .then(() => { console.log('✓ Assets locais prontos.'); })
+                .catch(err => { console.error('✗ Erro crítico nos assets:', err); });
         });
     </script>
 </body>

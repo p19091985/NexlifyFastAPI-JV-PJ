@@ -1,48 +1,63 @@
-/* /Nexlify_FastAPI/static/css/custom.css */
-
+/* Estilos movidos de _base.html para melhor organização */
 body {
-    /* Fonte padrão mais próxima do Streamlit */
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-    background-color: var(--bs-gray-100); /* Um fundo levemente cinza */
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--bs-secondary-bg);
 }
-
-/* Melhorar a aparência das tabelas */
-.table {
-    font-size: 0.9rem; /* Fonte um pouco menor */
-    border-color: var(--bs-gray-300);
+#sidebar {
+    width: 280px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1030;
+    border-right: var(--bs-border-width) solid var(--bs-border-color);
+    transition: transform 0.3s ease-in-out;
+    background-color: var(--bs-tertiary-bg);
 }
-
-.table th {
-    font-weight: 600; /* Cabeçalhos um pouco mais fortes */
-    background-color: var(--bs-gray-200); /* Fundo leve para cabeçalho */
-}
-
-.table tbody tr:hover {
-    background-color: var(--bs-gray-200); /* Destaque suave no hover */
-}
-
-/* Ajustes no espaçamento da sidebar (opcional) */
-#sidebar .nav-link {
-    padding-top: 0.6rem;
-    padding-bottom: 0.6rem;
-}
-
-#sidebar .fs-4 { /* Ajusta o título da sidebar */
-    font-weight: 600;
-}
-
-#sidebar hr {
-    margin-top: 0.8rem;
-    margin-bottom: 0.8rem;
-}
-
-/* Garante que o conteúdo principal não fique por baixo da sidebar fixa */
 main {
-     padding-top: 1rem;
-     padding-bottom: 1rem;
+    margin-left: 280px;
+    padding: 1.5rem;
+    flex-grow: 1;
+    width: calc(100% - 280px);
+    background-color: var(--bs-body-bg);
 }
-
-/* Opcional: Estilo mais sutil para botões Outline */
-.btn-outline-secondary, .btn-outline-danger {
-    --bs-btn-border-width: 1px;
+@media (max-width: 991.98px) {
+    #sidebar {
+        transform: translateX(-100%);
+        z-index: 1045;
+    }
+    #sidebar.show {
+        transform: translateX(0);
+    }
+    main {
+        margin-left: 0;
+        width: 100%;
+    }
+    #sidebar-toggler {
+        display: block !important;
+    }
+}
+#sidebar-toggler {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1050;
+    display: none;
+}
+/* Outros estilos personalizados podem continuar aqui */
+/* Estilo para indicador de carregamento de bibliotecas (opcional, pode ficar em _base.html) */
+.lib-status {
+    font-size: 0.875rem;
+}
+/* Estilos para indicadores HTMX (opcional, pode ficar em _base.html) */
+.htmx-indicator {
+    opacity: 0;
+    transition: opacity 200ms ease-in;
+}
+.htmx-request .htmx-indicator {
+    opacity: 1;
+}
+.htmx-request.htmx-indicator {
+    opacity: 1;
 }

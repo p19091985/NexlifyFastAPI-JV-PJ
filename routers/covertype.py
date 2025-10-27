@@ -1,5 +1,3 @@
-                                                                           
-
 import pandas as pd
 import numpy as np
 import sys
@@ -12,7 +10,7 @@ from fastapi import APIRouter, Request, Depends, Query, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 import auth as app_auth
-import config                 
+import config
 from utils.settings import get_current_settings
 
 from sklearn.datasets import fetch_covtype
@@ -61,8 +59,10 @@ def export_covertype_to_csv() -> str | None:
     except Exception as e:
         logger.error(f"Erro: Não foi possível baixar ou salvar o dataset Covertype: {e}")
         if FILE_PATH.exists():
-            try: FILE_PATH.unlink()
-            except OSError: pass
+            try:
+                FILE_PATH.unlink()
+            except OSError:
+                pass
         return None
 
 def get_statistical_summary(df: pd.DataFrame) -> tuple:
@@ -97,15 +97,16 @@ def get_balanced_sample(df: pd.DataFrame, n_per_class: int = 1000, target_col: s
         return pd.DataFrame()
     logger.info(f"Criando amostra balanceada com {actual_n_per_class} exemplos por classe...")
     try:
-                                                                      
-        balanced_sample_df = df.groupby(target_col, group_keys=False).apply(
-             lambda x: x.sample(n=actual_n_per_class, random_state=42)
+
+        balanced_sample_df = df.groupby(target_col, group_keys=False).sample(
+            n=actual_n_per_class, random_state=42
         ).sample(frac=1, random_state=42).reset_index(drop=True)
+
         logger.info(f"Amostra balanceada criada com {len(balanced_sample_df)} registros.")
         return balanced_sample_df
     except Exception as e:
-         logger.error(f"Erro durante a amostragem balanceada: {e}", exc_info=True)                      
-         return pd.DataFrame()                                   
+        logger.error(f"Erro durante a amostragem balanceada: {e}", exc_info=True)
+        return pd.DataFrame()
 
 def run_classification_models(df: pd.DataFrame) -> pd.DataFrame:
     target_col = 'Cover_Type'
@@ -117,7 +118,6 @@ def run_classification_models(df: pd.DataFrame) -> pd.DataFrame:
         df_sample = get_balanced_sample(df, n_per_class=1000, target_col=target_col)
         if df_sample.empty:
             logger.error("Amostragem balanceada retornou um DataFrame vazio. Verifique os logs anteriores.")
-                                                 
             return pd.DataFrame(columns=["Classificador", "Acurácia", "Precisão", "Recall", "F1-Score"])
     except Exception as e:
         logger.error(f"Exceção não tratada durante a amostragem: {e}", exc_info=True)
@@ -139,7 +139,8 @@ def run_classification_models(df: pd.DataFrame) -> pd.DataFrame:
         "AdaBoost": AdaBoostClassifier(random_state=42),
         "Gaussian Naive Bayes": GaussianNB(),
         "Análise Discriminante Linear": LinearDiscriminantAnalysis(),
-        "MLP (Rede Neural Simples)": MLPClassifier(max_iter=300, random_state=42, early_stopping=True, hidden_layer_sizes=(50,), alpha=0.001)
+        "MLP (Rede Neural Simples)": MLPClassifier(max_iter=300, random_state=42, early_stopping=True,
+                                                   hidden_layer_sizes=(50,), alpha=0.001)
     }
     results = []
     total_models = len(models)
@@ -148,7 +149,8 @@ def run_classification_models(df: pd.DataFrame) -> pd.DataFrame:
         logger.info(f"  ({i + 1}/{total_models}) Treinando: {name}...")
         y_pred = None
         try:
-            if name in ["Regressão Logística", "KNN (K=5)", "MLP (Rede Neural Simples)", "Análise Discriminante Linear"]:
+            if name in ["Regressão Logística", "KNN (K=5)", "MLP (Rede Neural Simples)",
+                        "Análise Discriminante Linear"]:
                 model.fit(X_train_scaled, y_train)
                 y_pred = model.predict(X_test_scaled)
             else:
@@ -157,19 +159,19 @@ def run_classification_models(df: pd.DataFrame) -> pd.DataFrame:
         except Exception as e:
             logger.warning(f"  Falha ao treinar o modelo '{name}': {e}")
             accuracy, precision, recall, f1 = np.nan, np.nan, np.nan, np.nan
-                                                                                        
+
         if y_pred is not None:
-             try:
-                 accuracy = accuracy_score(y_test, y_pred)
-                 precision = precision_score(y_test, y_pred, average='weighted', zero_division=0)
-                 recall = recall_score(y_test, y_pred, average='weighted', zero_division=0)
-                 f1 = f1_score(y_test, y_pred, average='weighted', zero_division=0)
-                 logger.info(f"  {name} - F1-Score (Weighted): {f1:.4f}")
-             except Exception as metric_e:
-                 logger.warning(f"  Erro ao calcular métricas para '{name}': {metric_e}")
-                 accuracy, precision, recall, f1 = np.nan, np.nan, np.nan, np.nan
-        else:                                    
-             accuracy, precision, recall, f1 = np.nan, np.nan, np.nan, np.nan
+            try:
+                accuracy = accuracy_score(y_test, y_pred)
+                precision = precision_score(y_test, y_pred, average='weighted', zero_division=0)
+                recall = recall_score(y_test, y_pred, average='weighted', zero_division=0)
+                f1 = f1_score(y_test, y_pred, average='weighted', zero_division=0)
+                logger.info(f"  {name} - F1-Score (Weighted): {f1:.4f}")
+            except Exception as metric_e:
+                logger.warning(f"  Erro ao calcular métricas para '{name}': {metric_e}")
+                accuracy, precision, recall, f1 = np.nan, np.nan, np.nan, np.nan
+        else:
+            accuracy, precision, recall, f1 = np.nan, np.nan, np.nan, np.nan
 
         results.append({
             "Classificador": name, "Acurácia": accuracy, "Precisão": precision,
@@ -177,7 +179,7 @@ def run_classification_models(df: pd.DataFrame) -> pd.DataFrame:
         })
 
     logger.info("Treinamento concluído.")
-                                                                                 
+
     if not results:
         logger.error("Nenhum modelo foi treinado com sucesso.")
         return pd.DataFrame(columns=["Classificador", "Acurácia", "Precisão", "Recall", "F1-Score"])
@@ -194,8 +196,8 @@ def load_data_with_cache() -> pd.DataFrame:
         return pd.DataFrame()
     full_csv_path = Path(csv_path_str)
     if not full_csv_path.exists():
-         logger.error(f"Arquivo CSV não encontrado em '{full_csv_path}'.")
-         return pd.DataFrame()
+        logger.error(f"Arquivo CSV não encontrado em '{full_csv_path}'.")
+        return pd.DataFrame()
     try:
         df = pd.read_csv(full_csv_path)
         logger.info(f"Dataset Covertype carregado ({len(df)} linhas).")
@@ -203,7 +205,7 @@ def load_data_with_cache() -> pd.DataFrame:
         return df
     except Exception as e:
         logger.error(f"Erro ao ler CSV '{full_csv_path}': {e}")
-        return pd.DataFrame()
+    return pd.DataFrame()
 
 def _df_to_tuple_for_cache(df):
     return tuple([tuple(df.columns)] + list(df.itertuples(index=False, name=None)))
@@ -223,7 +225,6 @@ def get_cached_stats(df_tuple):
 def get_cached_models(df_tuple):
     logger.debug("Executando run_classification_models...")
     df = _tuple_to_df_from_cache(df_tuple)
-                                                                                                        
     if df.empty:
         logger.error("DataFrame de entrada para get_cached_models está vazio.")
         return pd.DataFrame(columns=["Classificador", "Acurácia", "Precisão", "Recall", "F1-Score"])
@@ -233,9 +234,10 @@ def get_cached_models(df_tuple):
 async def get_covertype_page(request: Request):
     """Renderiza a página principal."""
     settings = get_current_settings()
-    try: load_data_with_cache()              
-    except Exception: pass
-                                 
+    try:
+        load_data_with_cache()
+    except Exception:
+        pass
     context = {"request": request, "settings": settings, "config": config}
     return templates.TemplateResponse("covertype.html", context)
 
@@ -245,8 +247,12 @@ async def get_tabela_covertype(request: Request, page: int = Query(1, ge=1)):
     try:
         df = load_data_with_cache()
         if df.empty:
-            if not FILE_PATH.exists(): return HTMLResponse("<div class='alert alert-danger'>Erro: Arquivo CSV não encontrado.</div>", status_code=500)
-            else: return HTMLResponse("<div class='alert alert-warning'>Dataset vazio ou erro ao carregar. Verifique os logs.</div>")                      
+            if not FILE_PATH.exists():
+                return HTMLResponse("<div class='alert alert-danger'>Erro: Arquivo CSV não encontrado.</div>",
+                                    status_code=500)
+            else:
+                return HTMLResponse(
+                    "<div class='alert alert-warning'>Dataset vazio ou erro ao carregar. Verifique os logs.</div>")
 
         PAGE_SIZE = 30
         total_rows = len(df)
@@ -254,6 +260,7 @@ async def get_tabela_covertype(request: Request, page: int = Query(1, ge=1)):
         current_page = max(1, min(page, total_pages))
         start_idx_0based = (current_page - 1) * PAGE_SIZE
         end_idx_0based = min(start_idx_0based + PAGE_SIZE, total_rows)
+
         df_page = df.iloc[start_idx_0based:end_idx_0based]
         headers = [str(col) for col in df.columns.tolist()]
         data = df_page.to_dict('records')
@@ -262,12 +269,14 @@ async def get_tabela_covertype(request: Request, page: int = Query(1, ge=1)):
             "page": current_page, "total_pages": total_pages,
             "start_idx": start_idx_0based + 1 if total_rows > 0 else 0,
             "end_idx": end_idx_0based, "total_rows": total_rows,
-            "config": config                                         
+            "config": config
         }
         return templates.TemplateResponse("partials/_covertype_tabela.html", context)
     except Exception as e:
         logger.exception("Erro ao carregar tabela.")
-        return HTMLResponse(f"<div class='alert alert-danger'>Erro inesperado ao carregar tabela. Verifique os logs.</div>", status_code=500)
+        return HTMLResponse(
+            f"<div class='alert alert-danger'>Erro inesperado ao carregar tabela. Verifique os logs.</div>",
+            status_code=500)
 
 @router.get("/analise", response_class=HTMLResponse)
 async def get_analise_covertype(request: Request):
@@ -275,29 +284,42 @@ async def get_analise_covertype(request: Request):
     try:
         df = load_data_with_cache()
         if df.empty:
-             if not FILE_PATH.exists(): return HTMLResponse("<div class='alert alert-danger'>Erro: Arquivo CSV não encontrado. Não é possível analisar.</div>", status_code=500)                      
-             else: return HTMLResponse("<div class='alert alert-warning'>Dataset vazio ou erro ao carregar. Não é possível analisar. Verifique os logs.</div>")                      
+            if not FILE_PATH.exists():
+                return HTMLResponse(
+                    "<div class='alert alert-danger'>Erro: Arquivo CSV não encontrado. Não é possível analisar.</div>",
+                    status_code=500)
+            else:
+                return HTMLResponse(
+                    "<div class='alert alert-warning'>Dataset vazio ou erro ao carregar. Não é possível analisar. Verifique os logs.</div>")
 
         logger.info("Iniciando análise Covertype (resumo + modelos)...")
         df_tuple = _df_to_tuple_for_cache(df)
         info_df, describe_df, target_dist_df = get_cached_stats(df_tuple)
-        results_df = get_cached_models(df_tuple)                                                                          
+        results_df = get_cached_models(df_tuple)
         logger.info("Análise concluída. Gerando HTML...")
 
-        info_html = info_df.to_html(index=False, classes="table table-sm table-striped table-bordered small mb-0", border=0) if not info_df.empty else "<p class='text-danger m-3'>Erro ao gerar informações das colunas.</p>"
-        describe_html = describe_df.to_html(classes="table table-sm table-striped table-bordered small mb-0", border=0, float_format='{:.2f}'.format) if not describe_df.empty else "<p class='text-danger m-3'>Erro ao gerar resumo descritivo.</p>"
-        target_dist_html = target_dist_df.to_html(classes="table table-sm table-striped table-bordered small mb-0", border=0, header=True) if not target_dist_df.empty else "<p class='text-danger m-3'>Erro ao gerar distribuição do alvo.</p>"
-        results_html = results_df.to_html(index=False, classes="table table-sm table-striped table-hover table-bordered small mb-0", border=0, float_format='{:.4f}'.format, na_rep='Falhou') if not results_df.empty else "<p class='text-danger m-3'>Erro ao treinar ou avaliar modelos. Verifique os logs para detalhes.</p>"                           
+        info_html = info_df.to_html(index=False, classes="table table-sm table-striped table-bordered small mb-0",
+                                    border=0) if not info_df.empty else "<p class='text-danger m-3'>Erro ao gerar informações das colunas.</p>"
+        describe_html = describe_df.to_html(classes="table table-sm table-striped table-bordered small mb-0", border=0,
+                                            float_format='{:.2f}'.format) if not describe_df.empty else "<p class='text-danger m-3'>Erro ao gerar resumo descritivo.</p>"
+        target_dist_html = target_dist_df.to_html(classes="table table-sm table-striped table-bordered small mb-0",
+                                                  border=0,
+                                                  header=True) if not target_dist_df.empty else "<p class='text-danger m-3'>Erro ao gerar distribuição do alvo.</p>"
+        results_html = results_df.to_html(index=False,
+                                          classes="table table-sm table-striped table-hover table-bordered small mb-0",
+                                          border=0, float_format='{:.4f}'.format,
+                                          na_rep='Falhou') if not results_df.empty else "<p class='text-danger m-3'>Erro ao treinar ou avaliar modelos. Verifique os logs para detalhes.</p>"
 
         context = {
             "request": request,
             "info_html": info_html, "describe_html": describe_html,
             "target_dist_html": target_dist_html, "results_html": results_html,
             "warning_sync": True,
-            "config": config                                         
+            "config": config
         }
         return templates.TemplateResponse("partials/_covertype_analise.html", context)
     except Exception as e:
-        logger.exception("Erro GERAL durante a análise Covertype.")                     
-                                                             
-        return HTMLResponse(f"<div class='alert alert-danger'>Erro inesperado ao processar a análise completa. Consulte os logs do servidor para mais detalhes.</div>", status_code=500)
+        logger.exception("Erro GERAL durante a análise Covertype.")
+        return HTMLResponse(
+            f"<div class='alert alert-danger'>Erro inesperado ao processar a análise completa. Consulte os logs do servidor para mais detalhes.</div>",
+            status_code=500)

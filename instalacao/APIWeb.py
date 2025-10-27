@@ -50,15 +50,14 @@ LIBS_TO_DOWNLOAD = [
         "file": "htmx.min.js",
         "target_dir": JS_DIR
     },
-    # Alpine.js removido
-    # Plotly removido
+
     {
         "name": "ApexCharts",
         "url": "https://cdn.jsdelivr.net/npm/apexcharts",
         "file": "apexcharts.min.js",
         "target_dir": JS_DIR
     }
-    # Hyperscript removido
+                          
 ]
 
 def download_libs():

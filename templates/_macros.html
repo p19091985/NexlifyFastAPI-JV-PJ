@@ -1,0 +1,47 @@
+{% macro render_card(card_id="", header_content="", body_content="", card_class="mb-4", header_class="", body_class="", footer_content="") -%}
+<div class="card {{ card_class }}" {% if card_id %}id="{{ card_id }}"{% endif %}>
+    {% if header_content %}
+    <div class="card-header {{ header_class }}">
+        {{ header_content | safe }} 
+    </div>
+    {% endif %}
+    {% if body_content or caller %}
+    <div class="card-body {{ body_class }}">
+        {% if body_content %}{{ body_content }}{% endif %}
+        {% if caller %}{{ caller() }}{% endif %}
+    </div>
+    {% endif %}
+    {% if footer_content %}
+    <div class="card-footer">
+        {{ footer_content }}
+    </div>
+    {% endif %}
+</div>
+{%- endmacro %}
+{% macro render_pagination(current_page, total_pages, target_selector, hx_get_url_base, indicator_selector=None) -%}
+{% if total_pages > 1 %}
+<div class="d-flex justify-content-between align-items-center mt-3">
+    <p class="text-muted mb-0 small">
+        Página {{ current_page }} de {{ total_pages }}
+    </p>
+    <div>
+        <button class="btn btn-outline-secondary btn-sm"
+                hx-get="{{ hx_get_url_base }}?page={{ current_page - 1 }}"
+                hx-target="{{ target_selector }}"
+                {% if indicator_selector %}hx-indicator="{{ indicator_selector }}"{% endif %}
+                hx-swap="innerHTML"
+                {% if current_page <= 1 %}disabled{% endif %}>
+            Anterior
+        </button>
+        <button class="btn btn-outline-secondary btn-sm"
+                hx-get="{{ hx_get_url_base }}?page={{ current_page + 1 }}"
+                hx-target="{{ target_selector }}"
+                {% if indicator_selector %}hx-indicator="{{ indicator_selector }}"{% endif %}
+                hx-swap="innerHTML"
+                {% if current_page >= total_pages %}disabled{% endif %}>
+            Próximo
+        </button>
+    </div>
+</div>
+{% endif %}
+{%- endmacro %}
