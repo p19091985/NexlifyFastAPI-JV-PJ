@@ -3,8 +3,8 @@
 INSTALADOR DE DEPENDÊNCIAS DE FRONTEND (Executar de /instalacao)
 =============================================================================
 
-Este script baixa TODAS as bibliotecas CSS e JavaScript necessárias
-(Bootstrap, HTMX, Alpine, Plotly, ApexCharts, Hyperscript) da internet e
+Este script baixa as bibliotecas CSS e JavaScript necessárias
+(Bootstrap, HTMX, ApexCharts) da internet e
 as salva nas pastas 'static/css/' e 'static/js/' LOCALIZADAS NA RAIZ DO PROJETO.
 
 Este script DEVE ser executado de dentro da pasta 'instalacao'.
@@ -23,58 +23,42 @@ import pathlib
 import sys
 
 SCRIPT_DIR = pathlib.Path(__file__).parent
-                                                                        
+
 PROJECT_ROOT = SCRIPT_DIR.parent
-                                                   
+
 BASE_DIR = PROJECT_ROOT / "static"
 CSS_DIR = BASE_DIR / "css"
 JS_DIR = BASE_DIR / "js"
 
 LIBS_TO_DOWNLOAD = [
-                                                      
+
     {
         "name": "Bootstrap CSS",
         "url": "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css",
         "file": "bootstrap.min.css",
-        "target_dir": CSS_DIR                                   
+        "target_dir": CSS_DIR
     },
     {
         "name": "Bootstrap JS",
         "url": "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js",
         "file": "bootstrap.bundle.min.js",
-        "target_dir": JS_DIR                                   
+        "target_dir": JS_DIR
     },
     {
         "name": "HTMX",
         "url": "https://cdn.jsdelivr.net/npm/htmx.org@2.0.0/dist/htmx.min.js",
         "file": "htmx.min.js",
-        "target_dir": JS_DIR                                   
+        "target_dir": JS_DIR
     },
-    {
-        "name": "Alpine.js",
-        "url": "https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js",
-        "file": "alpine.min.js",
-        "target_dir": JS_DIR                                   
-    },
-
-    {
-        "name": "Plotly",
-        "url": "https://cdn.plot.ly/plotly-latest.min.js",
-        "file": "plotly-latest.min.js",
-        "target_dir": JS_DIR                                   
-    },
+    # Alpine.js removido
+    # Plotly removido
     {
         "name": "ApexCharts",
         "url": "https://cdn.jsdelivr.net/npm/apexcharts",
         "file": "apexcharts.min.js",
-        "target_dir": JS_DIR                                   
-    },
-    {
-        "name": "Hyperscript",
-        "url": "https://unpkg.com/hyperscript.org@0.9.12/dist/_hyperscript.min.js",
-        "file": "_hyperscript.min.js",
         "target_dir": JS_DIR
     }
+    # Hyperscript removido
 ]
 
 def download_libs():
@@ -108,7 +92,7 @@ def download_libs():
                                                      
             response.raise_for_status()
 
-            target_path.write_text(response.text, encoding='utf-8')
+            target_path.write_bytes(response.content)
             print(f"   -> Salvo com sucesso em '{target_path}'")
             total_downloaded += 1
 

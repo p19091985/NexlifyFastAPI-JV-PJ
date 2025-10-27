@@ -8,15 +8,16 @@
         Esta aplicação oferece flexibilidade através de flags de configuração no arquivo <code>config.py</code>.
         Essas flags permitem ajustar o comportamento do sistema. 
     </div>
-    <div class="card mb-4" x-data="{ open: false }">
-        <div class="card-header" @click="open = !open" style="cursor: pointer;">
+
+    <div class="card mb-4">
+        <div class="card-header" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#collapseFlags" aria-expanded="false" aria-controls="collapseFlags">
              <h3 class="mb-0 d-flex justify-content-between align-items-center">
                 <span>📚 1. Detalhamento das Flags de Configuração (<code>config.py</code>)</span>
-                <span x-show="!open" class="text-muted small">▸ Expandir para ler</span>
-                <span x-show="open" class="text-muted small">▾ Recolher</span>
+                <span class="text-muted small">▸ Expandir/Recolher</span>
             </h3>
         </div>
-        <div class="card-body" x-show="open" x-transition>
+
+        <div class="card-body collapse" id="collapseFlags">
             <p>
                 Para alterar o modo de operação, edite o arquivo <code>config.py</code> na raiz do projeto
                 e <strong>reinicie o servidor FastAPI</strong>.
@@ -33,7 +34,7 @@
             </ul>
             <h4><code>INITIALIZE_DATABASE_ON_STARTUP</code> (Boolean)</h4>
             <ul>
-                <li><strong><code>True</code> (Setup Inicial/Testes Locais):</strong> (Aplica-se apenas ao SQLite) Tenta criar o banco e as tabelas se não existirem.  <strong>Requer <code>DATABASE_ENABLED = True</code></strong>.</li>
+                <li><strong><code>True</code> (Setup Inicial/Testes Locais):</strong> (Aplica-se apenas ao SQLite) Tenta criar o banco e as tabelas se não existirem. <strong>Requer <code>DATABASE_ENABLED = True</code></strong>.</li>
                 <li><strong><code>False</code> (Produção):</strong> Assume que o banco de dados já existe e está configurado. </li>
             </ul>
             <h4><code>REDIRECT_CONSOLE_TO_LOG</code> (Boolean)</h4>
@@ -43,11 +44,11 @@
             </ul>
         </div>
     </div>
+
     <h3 class="mt-5">💡 2. Cenários Comuns e Combinações de Flags</h3>
     <div class="alert alert-success">
         <strong>Sistema de Validação Integrado!</strong>
-        Ao iniciar, o servidor FastAPI verifica automaticamente (em `main.py`) se as flags formam uma combinação lógica.
-        Combinações inválidas impedirão a inicialização.
+        Ao iniciar, o servidor FastAPI verifica automaticamente (em `main.py`) se as flags formam uma combinação lógica. Combinações inválidas impedirão a inicialização.
     </div>
     <div class="row">
         <div class="col-md-6 mb-4">
@@ -58,18 +59,17 @@
                           <path d="M5.338 1.59a61.44 61.44 0 0 0-2.837.856.481.481 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.725 10.725 0 0 0 2.287 2.233c.346.244.652.42.893.533.12.056.255.098.38.115l.013.002c.004.001.007.001.01.001l.002.001l.002.001.001.001c.01.001.02.001.03.002l.001.001.001.001c.01 0 .02-.001.03-.001.002 0 .004 0 .006-.001l.001-.001c.125-.017.26-.059.38-.115.24-.113.547-.29.893-.533a10.726 10.726 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.95- .3-1.886-.626-2.837-.855A61.44 61.44 0 0 0 8 1.5c-.73 0-1.44.13-2.122.383zM14.002 4.169c.394 3.012-.464 5.25-1.542 6.756-.32.418-.72 1.009-1.22 1.58C10.58 13.542 9.38 14 8 14c-1.38 0-2.58-.458-3.24-1.494C4.24 11.419 3.84 10.828 3.52 10.41c-1.078-1.506-1.936-3.744-1.542-6.756C2.39 3.19 3.09 2.73 3.66 2.48c.84-.35 1.76-.59 2.798-.76C7.06 1.558 7.524 1.5 8 1.5c.476 0 .94.058 1.442.17c1.038.17 1.958.41 2.798.76c.57.25 1.27.71 1.762 1.539z"/>
                           <path d="M10.854 6.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 8.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
                         </svg>
-                        Modo Produção
+                         Modo Produção
                     </h4>
                 </div>
                 <div class="card-body">
                     <p>Configuração ideal para o ambiente final com segurança e dados persistentes.</p>
-                    <div x-data="{ copied: false }" class="position-relative">
+                     <div class="position-relative">
                         <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2"
-                                @click="navigator.clipboard.writeText($el.nextElementSibling.innerText); copied = true; setTimeout(() => copied = false, 1500)">
-                            <span x-show="!copied">Copiar</span>
-                            <span x-show="copied">Copiado!</span>
+                                onclick="navigator.clipboard.writeText(this.nextElementSibling.innerText); this.innerText='Copiado!'; setTimeout(() => this.innerText = 'Copiar', 1500)">
+                            <span>Copiar</span>
                         </button>
-                        <pre class="bg-dark text-white p-3 rounded"><code>DATABASE_ENABLED = True
+                         <pre class="bg-dark text-white p-3 rounded"><code>DATABASE_ENABLED = True
 USE_LOGIN = True
 INITIALIZE_DATABASE_ON_STARTUP = False
 REDIRECT_CONSOLE_TO_LOG = True</code></pre>
@@ -78,24 +78,23 @@ REDIRECT_CONSOLE_TO_LOG = True</code></pre>
             </div>
         </div>
         <div class="col-md-6 mb-4">
-            <div class="card h-100 shadow-sm">
+             <div class="card h-100 shadow-sm">
                 <div class="card-header">
                     <h4>
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-code-slash me-1" viewBox="0 0 16 16">
-                          <path d="M10.478 1.647a.5.5 0 1 0-.956.294l-4 13a.5.5 0 0 0 .956.294l4-13zM4.854 4.146a.5.5 0 0 1 0 .708L1.707 8l3.147 3.146a.5.5 0 0 1-.708.708l-3.5-3.5a.5.5 0 0 1 0-.708l3.5-3.5a.5.5 0 0 1 .708 0zm6.292 0a.5.5 0 0 0 0 .708L14.293 8l-3.147 3.146a.5.5 0 0 0 .708.708l3.5-3.5a.5.5 0 0 0 0-.708l-3.5-3.5a.5.5 0 0 0-.708 0z"/>
+                           <path d="M10.478 1.647a.5.5 0 1 0-.956.294l-4 13a.5.5 0 0 0 .956.294l4-13zM4.854 4.146a.5.5 0 0 1 0 .708L1.707 8l3.147 3.146a.5.5 0 0 1-.708.708l-3.5-3.5a.5.5 0 0 1 0-.708l3.5-3.5a.5.5 0 0 1 .708 0zm6.292 0a.5.5 0 0 0 0 .708L14.293 8l-3.147 3.146a.5.5 0 0 0 .708.708l3.5-3.5a.5.5 0 0 0 0-.708l-3.5-3.5a.5.5 0 0 0-.708 0z"/>
                         </svg>
-                        Dev Back-end
+                         Dev Back-end
                     </h4>
                 </div>
                 <div class="card-body">
                     <p>Ideal para trabalhar na lógica de dados sem a barreira do login.</p>
-                    <div x-data="{ copied: false }" class="position-relative">
+                     <div class="position-relative">
                         <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2"
-                                @click="navigator.clipboard.writeText($el.nextElementSibling.innerText); copied = true; setTimeout(() => copied = false, 1500)">
-                            <span x-show="!copied">Copiar</span>
-                            <span x-show="copied">Copiado!</span>
+                                onclick="navigator.clipboard.writeText(this.nextElementSibling.innerText); this.innerText='Copiado!'; setTimeout(() => this.innerText = 'Copiar', 1500)">
+                            <span>Copiar</span>
                         </button>
-                        <pre class="bg-dark text-white p-3 rounded"><code>DATABASE_ENABLED = True
+                         <pre class="bg-dark text-white p-3 rounded"><code>DATABASE_ENABLED = True
 USE_LOGIN = False
 INITIALIZE_DATABASE_ON_STARTUP = True
 REDIRECT_CONSOLE_TO_LOG = False</code></pre>
@@ -104,24 +103,23 @@ REDIRECT_CONSOLE_TO_LOG = False</code></pre>
             </div>
         </div>
         <div class="col-md-6 mb-4">
-            <div class="card h-100 shadow-sm">
+             <div class="card h-100 shadow-sm">
                 <div class="card-header">
                     <h4>
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-palette-fill me-1" viewBox="0 0 16 16">
-                          <path d="M12.433 10.07C14.133 10.585 16 11.15 16 8a8 8 0 1 0-8 8c1.996 0 1.826-1.504 1.649-3.08-.124-1.101-.252-2.237.351-2.92.465-.527 1.42-.237 2.433.07zM8 5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm4.5 3a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zM5 6.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm.5 6.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+                           <path d="M12.433 10.07C14.133 10.585 16 11.15 16 8a8 8 0 1 0-8 8c1.996 0 1.826-1.504 1.649-3.08-.124-1.101-.252-2.237.351-2.92.465-.527 1.42-.237 2.433.07zM8 5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm4.5 3a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zM5 6.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm.5 6.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
                         </svg>
-                        Dev Front-end (Offline)
+                         Dev Front-end (Offline)
                     </h4>
                 </div>
                 <div class="card-body">
                     <p>Perfeito para focar no design visual sem depender de um banco de dados.</p>
-                     <div x-data="{ copied: false }" class="position-relative">
+                     <div class="position-relative">
                         <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2"
-                                @click="navigator.clipboard.writeText($el.nextElementSibling.innerText); copied = true; setTimeout(() => copied = false, 1500)">
-                            <span x-show="!copied">Copiar</span>
-                            <span x-show="copied">Copiado!</span>
+                                onclick="navigator.clipboard.writeText(this.nextElementSibling.innerText); this.innerText='Copiado!'; setTimeout(() => this.innerText = 'Copiar', 1500)">
+                            <span>Copiar</span>
                         </button>
-                        <pre class="bg-dark text-white p-3 rounded"><code>DATABASE_ENABLED = False
+                         <pre class="bg-dark text-white p-3 rounded"><code>DATABASE_ENABLED = False
 USE_LOGIN = False
 INITIALIZE_DATABASE_ON_STARTUP = False
 REDIRECT_CONSOLE_TO_LOG = False</code></pre>
@@ -137,7 +135,7 @@ REDIRECT_CONSOLE_TO_LOG = False</code></pre>
                 <div class="card-header bg-danger text-white">
                     <h4>Inválido 1: Login Sem Banco</h4>
                 </div>
-                <div class="card-body">
+                 <div class="card-body">
                     <pre class="bg-light p-3 rounded"><code>DATABASE_ENABLED = False
 USE_LOGIN = True</code></pre>
                     <p class="mb-0"><strong>Motivo:</strong> Impossível verificar credenciais sem acesso ao banco. </p>

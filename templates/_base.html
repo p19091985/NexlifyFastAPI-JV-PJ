@@ -51,36 +51,20 @@
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#sidebarOffcanvas" aria-label="Close"></button>
        </div>
        <div class="offcanvas-body p-0">
+
            <div id="sidebar">
                {% include "_sidebar.html" %}
            </div>
        </div>
     </div>
     <main>
-        <!-- Indicador de status das bibliotecas (pode ser removido depois que funcionar) -->
-        <!-- <div class="alert alert-info lib-status mb-3 py-2" role="alert">
-            <small>
-                <strong>Status:</strong>
-                <span id="apex-status" class="badge bg-secondary">Verificando ApexCharts...</span>
-                <span id="alpine-status" class="badge bg-secondary">Verificando Alpine.js...</span>
-                <span id="htmx-status" class="badge bg-secondary">Verificando HTMX...</span>
-            </small>
-        </div> -->
-        {% block content %}{% endblock %}
+
+         {% block content %}{% endblock %}
     </main>
-    <!-- SCRIPTS: ORDEM CRÍTICA - APEXCHARTS SEM DEFER PARA GARANTIR LOAD ANTES DE ALPINE -->
-    <!-- 1. ApexCharts PRIMEIRO e SÍNCRONO -->
     <script src="/static/js/apexcharts.min.js"></script>
-    <!-- 2. Bootstrap (SÍNCRONO) -->
     <script src="/static/js/bootstrap.bundle.min.js"></script>
-    <!-- 3. HTMX -->
     <script src="/static/js/htmx.min.js"></script>
-    <!-- 4. Plotly (se necessário) -->
-    <script src="/static/js/plotly-latest.min.js"></script>
-    <!-- 5. Hyperscript (se necessário) -->
-    <script src="/static/js/_hyperscript.min.js"></script>
-    <!-- 6. Alpine.js POR ÚLTIMO, SEM DEFER PARA SYNC COM GRÁFICOS -->
-    <script src="/static/js/alpine.min.js"></script>
+
     <script nonce="{{ request.scope.get('csp_nonce', '') }}">
         // Global Promise para aguardar ApexCharts (usado nos templates)
         window.apexChartsLoaded = new Promise((resolve, reject) => {
@@ -116,10 +100,10 @@
                      sidebar.classList.remove('show');
                  }
             });
-             function adjustSidebarVisibility() {
+            function adjustSidebarVisibility() {
                  if (window.innerWidth >= 992) {
                      sidebar.classList.add('show');
-                      sidebarOffcanvas.classList.remove('show');
+                     sidebarOffcanvas.classList.remove('show');
                  } else {
                       if (!sidebarOffcanvas.classList.contains('show')) {
                            sidebar.classList.remove('show');
@@ -135,7 +119,7 @@
             window.apexChartsLoaded.then(() => {
                 console.log('✓ Todos os assets prontos');
             }).catch(err => {
-                console.error('✗ Erro crítico em assets:', err);
+                 console.error('✗ Erro crítico em assets:', err);
             });
         });
     </script>

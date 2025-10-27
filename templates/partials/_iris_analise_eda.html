@@ -1,13 +1,97 @@
-<div x-data
-     x-init="
+<div>
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div id="chart-eda-1" style="min-height: 365px;">
+                        <div class="text-center p-4">
+                             <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Carregando gráfico 1...</span>
+                            </div>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                 <div class="card-body">
+                    <div id="chart-eda-2" style="min-height: 365px;">
+                        <div class="text-center p-4">
+                            <div class="spinner-border text-primary" role="status">
+                                 <span class="visually-hidden">Carregando gráfico 2...</span>
+                            </div>
+                        </div>
+                    </div>
+                 </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div id="chart-eda-3" style="min-height: 365px;">
+                         <div class="text-center p-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Carregando gráfico 3...</span>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div id="chart-eda-4" style="min-height: 365px;">
+                        <div class="text-center p-4">
+                             <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Carregando gráfico 4...</span>
+                            </div>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                     <div id="chart-eda-5" style="min-height: 365px;">
+                        <div class="text-center p-4">
+                            <div class="spinner-border text-primary" role="status">
+                                 <span class="visually-hidden">Carregando gráfico 5...</span>
+                            </div>
+                        </div>
+                    </div>
+                 </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div id="chart-eda-6" style="min-height: 365px;">
+                         <div class="text-center p-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Carregando gráfico 6...</span>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (async () => {
         const initCharts = async () => {
             try {
                 // Aguarda ApexCharts com Promise global + timeout extra
                 await window.apexChartsLoaded;
-                await new Promise(resolve => setTimeout(resolve, 500));  // Aumentado para 500ms
+                 await new Promise(resolve => setTimeout(resolve, 500));  // Aumentado para 500ms
                 if (typeof ApexCharts === 'undefined') {
                     throw new Error('ApexCharts ainda não carregado após retry');
                 }
+
                 const renderChart = (chartId, chartData) => {
                     const chartDiv = document.querySelector(chartId);
                     if (!chartDiv) {
@@ -46,86 +130,5 @@
             }
         };
         initCharts();
-     "
->
-    <div class="row g-3">
-        <div class="col-lg-6">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <div id="chart-eda-1" style="min-height: 365px;">
-                        <div class="text-center p-4">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Carregando gráfico 1...</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <div id="chart-eda-2" style="min-height: 365px;">
-                        <div class="text-center p-4">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Carregando gráfico 2...</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <div id="chart-eda-3" style="min-height: 365px;">
-                        <div class="text-center p-4">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Carregando gráfico 3...</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <div id="chart-eda-4" style="min-height: 365px;">
-                        <div class="text-center p-4">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Carregando gráfico 4...</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <div id="chart-eda-5" style="min-height: 365px;">
-                        <div class="text-center p-4">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Carregando gráfico 5...</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <div id="chart-eda-6" style="min-height: 365px;">
-                        <div class="text-center p-4">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Carregando gráfico 6...</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+    })();
+</script>

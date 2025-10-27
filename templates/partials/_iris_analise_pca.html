@@ -1,7 +1,19 @@
 {% if error_message %}
 <div class="alert alert-warning">{{ error_message }}</div>
 {% else %}
-<div class="card shadow-sm" x-data x-init="
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div id="chart-pca-1" style="min-height: 465px;">
+            <div class="text-center p-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Carregando gráfico PCA...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
     (async () => {
         try {
             await window.apexChartsLoaded;
@@ -31,15 +43,5 @@
             document.querySelector('#chart-pca-1').innerHTML = '<div class=\'alert alert-danger small p-2 text-center\'>Erro no PCA. Verifique console.</div>';
         }
     })();
-">
-    <div class="card-body">
-        <div id="chart-pca-1" style="min-height: 465px;">
-            <div class="text-center p-4">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Carregando gráfico PCA...</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+</script>
 {% endif %}
